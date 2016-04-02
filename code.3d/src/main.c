@@ -29,13 +29,13 @@ static G3Xcolor colmap[MAXCOL];
 static G3Xvector W={1.,2.,3.};
 static double    b=0.1;
 void Anim(void)
-{
+{/*
 	static double pas=0.1;
 	b+=pas;
 	W[0]+=pas;
 	W[1]-=pas;
 	W[2]+=pas;
-	if (W[0]<-10. || W[0]>+10.) pas=-pas;
+	if (W[0]<-10. || W[0]>+10.) pas=-pas;*/
 }
 
 /* flag d'affichag/masquage */
@@ -43,6 +43,78 @@ static bool FLAG_TEAPOT=true;
 static bool FLAG_TORUS =true;
 static bool FLAG_CONE  =true;
 static bool FLAG_ICOS  =true;
+
+
+
+
+
+void drawCube(){
+	glPushMatrix();
+    	glTranslatef(0.,0.,0.);
+    	glRotatef(angle,0.,0.,1.);
+    	glRotatef(90,1.,0.,0.);
+    	g3x_Material(bleu,ambi,diff,spec,shin,1.);
+			glDisable(GL_CULL_FACE);
+    	    	glutWireCube(.5);  
+glutSolidCube(.5);
+			glEnable(GL_CULL_FACE);
+  	glPopMatrix();
+}
+void drawRectangle(){
+	 glPushMatrix();
+   /* glColor3f(0.0f, 0.0f, 0.0f);
+	glRectf(-0.75f,0.45f, 0.75f, -0.45f);
+   	
+   	glTranslatef(0.,0.,1.);
+	glRectf(-0.75f,0.45f, 0.75f, -0.45f);
+	
+	glRotatef(90,1.,0.,0.);
+   	glTranslatef(0.,-.5,-.5);
+	glRectf(-0.75f,0.45f, 0.75f, -0.45f);
+	*/
+	/*glRotatef(0,1.,0.,0.);
+   	glTranslatef(0.,0.,1.);
+	glRectf(-0.75f,0.45f, 0.75f, -0.45f);*/
+	
+	glBegin(GL_QUADS);        /* Draw The Cube Using quads*/
+    glColor3f(0.0f,1.0f,0.0f);    /* Color Blue*/
+    glVertex3f( 1.0f, 2.0f,-1.0f);    /* Top Right Of The Quad (Top)*/
+    glVertex3f(-1.0f, 2.0f,-1.0f);    /* Top Left Of The Quad (Top)*/
+    glVertex3f(-1.0f, 2.0f, 1.0f);    /* Bottom Left Of The Quad (Top)*/
+    glVertex3f( 1.0f, 2.0f, 1.0f);    /* Bottom Right Of The Quad (Top)*/
+    glColor3f(1.0f,0.5f,0.0f);    /* Color Orange*/
+    glVertex3f( 1.0f,-2.0f, 1.0f);    /* Top Right Of The Quad (Bottom)*/
+    glVertex3f(-1.0f,-2.0f, 1.0f);    /* Top Left Of The Quad (Bottom)*/
+    glVertex3f(-1.0f,-2.0f,-1.0f);    /* Bottom Left Of The Quad (Bottom)*/
+    glVertex3f( 1.0f,-2.0f,-1.0f);    /* Bottom Right Of The Quad (Bottom)*/
+    glColor3f(1.0f,0.0f,0.0f);    /* Color Red    */
+    glVertex3f( 1.0f, 2.0f, 1.0f);    /* Top Right Of The Quad (Front)*/
+    glVertex3f(-1.0f, 2.0f, 1.0f);    /* Top Left Of The Quad (Front)*/
+    glVertex3f(-1.0f,-2.0f, 1.0f);    /* Bottom Left Of The Quad (Front)*/
+    glVertex3f( 1.0f,-2.0f, 1.0f);    /* Bottom Right Of The Quad (Front)*/
+    glColor3f(1.0f,1.0f,0.0f);    /* Color Yellow*/
+    glVertex3f( 1.0f,-2.0f,-1.0f);    /* Top Right Of The Quad (Back)*/
+    glVertex3f(-1.0f,-2.0f,-1.0f);    /* Top Left Of The Quad (Back)*/
+    glVertex3f(-1.0f, 2.0f,-1.0f);    /* Bottom Left Of The Quad (Back)*/
+    glVertex3f( 1.0f, 2.0f,-1.0f);    /* Bottom Right Of The Quad (Back)*/
+    glColor3f(0.0f,0.0f,1.0f);    /* Color Blue*/
+    glVertex3f(-1.0f, 2.0f, 1.0f);    /* Top Right Of The Quad (Left)*/
+    glVertex3f(-1.0f, 2.0f,-1.0f);    /* Top Left Of The Quad (Left)*/
+    glVertex3f(-1.0f,-2.0f,-1.0f);    /* Bottom Left Of The Quad (Left)*/
+    glVertex3f(-1.0f,-2.0f, 1.0f);    /* Bottom Right Of The Quad (Left)*/
+    glColor3f(1.0f,0.0f,1.0f);    /* Color Violet*/
+    glVertex3f( 1.0f, 2.0f,-1.0f);    /* Top Right Of The Quad (Right)*/
+    glVertex3f( 1.0f, 2.0f, 1.0f);    /* Top Left Of The Quad (Right)*/
+    glVertex3f( 1.0f,-1.0f, 1.0f);    /* Bottom Left Of The Quad (Right)*/
+    glVertex3f( 1.0f,-2.0f,-1.0f);    /* Bottom Right Of The Quad (Right)*/
+  glEnd();
+	glPopMatrix();
+}
+
+
+
+
+
 
 /*= FONCTION DE DESSIN PRINCIPALE =*/
 static void Dessin(void)
@@ -56,8 +128,67 @@ static void Dessin(void)
   	g3x_Material(vert,ambi,diff,spec,shin,alpha);*/
 	glDisable(GL_BLEND);
 
+    
+    glPushMatrix();
+   /* glColor3f(0.0f, 0.0f, 0.0f);
+	glRectf(-0.75f,0.45f, 0.75f, -0.45f);
+   	
+   	glTranslatef(0.,0.,1.);
+	glRectf(-0.75f,0.45f, 0.75f, -0.45f);
+	
+	glRotatef(90,1.,0.,0.);
+   	glTranslatef(0.,-.5,-.5);
+	glRectf(-0.75f,0.45f, 0.75f, -0.45f);
+	*/
+	/*glRotatef(0,1.,0.,0.);
+   	glTranslatef(0.,0.,1.);
+	glRectf(-0.75f,0.45f, 0.75f, -0.45f);*/
+	
+	glBegin(GL_QUADS);        /* Draw The Cube Using quads*/
+    glColor3f(0.0f,1.0f,0.0f);    /* Color Blue*/
+    glVertex3f( 1.0f, 2.0f,-1.0f);    /* Top Right Of The Quad (Top)*/
+    glVertex3f(-1.0f, 2.0f,-1.0f);    /* Top Left Of The Quad (Top)*/
+    glVertex3f(-1.0f, 2.0f, 1.0f);    /* Bottom Left Of The Quad (Top)*/
+    glVertex3f( 1.0f, 2.0f, 1.0f);    /* Bottom Right Of The Quad (Top)*/
+    glColor3f(1.0f,0.5f,0.0f);    /* Color Orange*/
+    glVertex3f( 1.0f,-2.0f, 1.0f);    /* Top Right Of The Quad (Bottom)*/
+    glVertex3f(-1.0f,-2.0f, 1.0f);    /* Top Left Of The Quad (Bottom)*/
+    glVertex3f(-1.0f,-2.0f,-1.0f);    /* Bottom Left Of The Quad (Bottom)*/
+    glVertex3f( 1.0f,-2.0f,-1.0f);    /* Bottom Right Of The Quad (Bottom)*/
+    glColor3f(1.0f,0.0f,0.0f);    /* Color Red    */
+    glVertex3f( 1.0f, 2.0f, 1.0f);    /* Top Right Of The Quad (Front)*/
+    glVertex3f(-1.0f, 2.0f, 1.0f);    /* Top Left Of The Quad (Front)*/
+    glVertex3f(-1.0f,-2.0f, 1.0f);    /* Bottom Left Of The Quad (Front)*/
+    glVertex3f( 1.0f,-2.0f, 1.0f);    /* Bottom Right Of The Quad (Front)*/
+    glColor3f(1.0f,1.0f,0.0f);    /* Color Yellow*/
+    glVertex3f( 1.0f,-2.0f,-1.0f);    /* Top Right Of The Quad (Back)*/
+    glVertex3f(-1.0f,-2.0f,-1.0f);    /* Top Left Of The Quad (Back)*/
+    glVertex3f(-1.0f, 2.0f,-1.0f);    /* Bottom Left Of The Quad (Back)*/
+    glVertex3f( 1.0f, 2.0f,-1.0f);    /* Bottom Right Of The Quad (Back)*/
+    glColor3f(0.0f,0.0f,1.0f);    /* Color Blue*/
+    glVertex3f(-1.0f, 2.0f, 1.0f);    /* Top Right Of The Quad (Left)*/
+    glVertex3f(-1.0f, 2.0f,-1.0f);    /* Top Left Of The Quad (Left)*/
+    glVertex3f(-1.0f,-2.0f,-1.0f);    /* Bottom Left Of The Quad (Left)*/
+    glVertex3f(-1.0f,-2.0f, 1.0f);    /* Bottom Right Of The Quad (Left)*/
+    glColor3f(1.0f,0.0f,1.0f);    /* Color Violet*/
+    glVertex3f( 1.0f, 2.0f,-1.0f);    /* Top Right Of The Quad (Right)*/
+    glVertex3f( 1.0f, 2.0f, 1.0f);    /* Top Left Of The Quad (Right)*/
+    glVertex3f( 1.0f,-1.0f, 1.0f);    /* Bottom Left Of The Quad (Right)*/
+    glVertex3f( 1.0f,-2.0f,-1.0f);    /* Bottom Right Of The Quad (Right)*/
+  glEnd();
+	glPopMatrix();
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
-
+/*
 
 	if (FLAG_TEAPOT)
 	{
@@ -68,14 +199,12 @@ static void Dessin(void)
     	g3x_Material(bleu,ambi,diff,spec,shin,1.);
 			glDisable(GL_CULL_FACE);
     	    	glutWireCube(.5);  
-glutSolidCube(.5);
+		glutSolidCube(.5);
 			glEnable(GL_CULL_FACE);
   	glPopMatrix();
 	}
 
 	
-
-/*	
 	if (FLAG_TORUS)
 	{
   	glPushMatrix();
