@@ -29,13 +29,13 @@ static G3Xcolor colmap[MAXCOL];
 static G3Xvector W={1.,2.,3.};
 static double    b=0.1;
 void Anim(void)
-{
+{/*
 	static double pas=0.1;
 	b+=pas;
 	W[0]+=pas;
 	W[1]-=pas;
 	W[2]+=pas;
-	if (W[0]<-10. || W[0]>+10.) pas=-pas;
+	if (W[0]<-10. || W[0]>+10.) pas=-pas;*/
 }
 
 /* flag d'affichag/masquage */
@@ -44,22 +44,166 @@ static bool FLAG_TORUS =true;
 static bool FLAG_CONE  =true;
 static bool FLAG_ICOS  =true;
 
+
+
+
+
+void drawCube(){
+	glPushMatrix();
+    	glTranslatef(0.,0.,0.);
+    	glRotatef(angle,0.,0.,1.);
+    	glRotatef(90,1.,0.,0.);
+    	g3x_Material(bleu,ambi,diff,spec,shin,1.);
+			glDisable(GL_CULL_FACE);
+    	    	glutWireCube(.5);  
+glutSolidCube(.5);
+			glEnable(GL_CULL_FACE);
+  	glPopMatrix();
+}
+void drawRectangle(){
+	 glPushMatrix();
+	    glClear(GL_COLOR_BUFFER_BIT);
+	glBegin(GL_QUADS);        /* Draw The Cube Using quads*/
+    glColor3f(0.0f,1.0f,0.0f);    /* Color Blue*/
+    glVertex3f( 1.0f, 1.6f,-1.0f);    /* Top Right Of The Quad (Top)*/
+    glVertex3f(-1.0f, 1.6f,-1.0f);    /* Top Left Of The Quad (Top)*/
+    glVertex3f(-1.0f, 1.6f, 1.0f);    /* Bottom Left Of The Quad (Top)*/
+    glVertex3f( 1.0f, 1.6f, 1.0f);    /* Bottom Right Of The Quad (Top)*/
+    g3x_Material(magenta,ambi,diff,spec,shin,1.);
+    glColor3f(1.0f,0.5f,0.0f);    /* Color Orange*/
+    glVertex3f( 1.0f,-1.6f, 1.0f);    /* Top Right Of The Quad (Bottom)*/
+    glVertex3f(-1.0f,-1.6f, 1.0f);    /* Top Left Of The Quad (Bottom)*/
+    glVertex3f(-1.0f,-1.6f,-1.0f);    /* Bottom Left Of The Quad (Bottom)*/
+    glVertex3f( 1.0f,-1.6f,-1.0f);    /* Bottom Right Of The Quad (Bottom)*/
+
+    glColor3f(1.0f,0.0f,0.0f);    /* Color Red    */
+    glVertex3f( 1.0f, 1.6f, 1.0f);    /* Top Right Of The Quad (Front)*/
+    glVertex3f(-1.0f, 1.6f, 1.0f);    /* Top Left Of The Quad (Front)*/
+    glVertex3f(-1.0f,-1.6f, 1.0f);    /* Bottom Left Of The Quad (Front)*/
+    glVertex3f( 1.0f,-1.6f, 1.0f);    /* Bottom Right Of The Quad (Front)*/
+    glColor3f(1.0f,1.0f,0.0f);    /* Color Yellow*/
+    glVertex3f( 1.0f,-1.6f,-1.0f);    /* Top Right Of The Quad (Back)*/
+    glVertex3f(-1.0f,-1.6f,-1.0f);    /* Top Left Of The Quad (Back)*/
+    glVertex3f(-1.0f, 1.6f,-1.0f);    /* Bottom Left Of The Quad (Back)*/
+    glVertex3f( 1.0f, 1.6f,-1.0f);    /* Bottom Right Of The Quad (Back)*/
+    glColor3f(0.0f,0.0f,1.0f);    /* Color Blue*/
+    glVertex3f(-1.0f, 1.6f, 1.0f);    /* Top Right Of The Quad (Left)*/
+    glVertex3f(-1.0f, 1.6f,-1.0f);    /* Top Left Of The Quad (Left)*/
+    glVertex3f(-1.0f,-1.6f,-1.0f);    /* Bottom Left Of The Quad (Left)*/
+    glVertex3f(-1.0f,-1.6f, 1.0f);    /* Bottom Right Of The Quad (Left)*/
+    glColor3f(1.0f,0.0f,1.0f);    /* Color Violet*/
+    glVertex3f( 1.0f, 1.6f,-1.0f);    /* Top Right Of The Quad (Right)*/
+    glVertex3f( 1.0f, 1.6f, 1.0f);    /* Top Left Of The Quad (Right)*/
+    glVertex3f( 1.0f,-1.6f, 1.0f);    /* Bottom Left Of The Quad (Right)*/
+    glVertex3f( 1.0f,-1.6f,-1.0f);    /* Bottom Right Of The Quad (Right)*/
+  glEnd();
+	glPopMatrix();
+}
+
+
+drawSphere(){
+	int i, j;
+int lats = 20;
+int longs = 30;
+        for(i = 0; i <= lats; i++) {
+           double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
+           double z0  = sin(lat0);
+           double zr0 =  cos(lat0);
+    
+           double lat1 = M_PI * (-0.5 + (double) i / lats);
+           double z1 = sin(lat1);
+           double zr1 = cos(lat1);
+  
+           glBegin(GL_QUAD_STRIP);
+           for(j = 0; j <= longs; j++) {
+               double lng = 2 * M_PI * (double) (j - 1) / longs;
+               double x = cos(lng);
+               double y = sin(lng);
+  
+               glNormal3f(x * zr0, y * zr0, z0);
+               glVertex3f(x * zr0, y * zr0, z0);
+               glNormal3f(x * zr1, y * zr1, z1);
+               glVertex3f(x * zr1, y * zr1, z1);
+           }
+	   
+           glEnd();
+	}
+}
+
+void drawTriangle(){
+		glBegin(GL_TRIANGLES);
+		g3x_Material(vert,ambi,diff,spec,shin,alpha);
+
+ 		glColor3f(1.0f,0.0f,0.0f);						/* Red*/
+		glVertex3f( 0.0f, 1.0f, 0.0f);					/* Top Of Triangle (Front)*/
+		glColor3f(0.0f,1.0f,0.0f);						/* Green*/
+		glVertex3f(-1.0f,-1.0f, 1.0f);					/* Left Of Triangle (Front)*/
+		glColor3f(0.0f,0.0f,1.0f);						/* Blue*/
+		glVertex3f( 1.0f,-1.0f, 1.0f);					/* Right Of Triangle (Front)*/
+			g3x_Material(bleu,ambi,diff,spec,shin,alpha);
+
+		glColor3f(1.0f,0.0f,0.0f);						/* Red*/
+		glVertex3f( 0.0f, 1.0f, 0.0f);					/* Top Of Triangle (Right)*/
+		glColor3f(0.0f,0.0f,1.0f);						/* Blue*/
+		glVertex3f( 1.0f,-1.0f, 1.0f);					/* Left Of Triangle (Right)*/
+		glColor3f(0.0f,1.0f,0.0f);						/* Green*/
+		glVertex3f( 1.0f,-1.0f, -1.0f);					/* Right Of Triangle (Right)*/
+			g3x_Material(jaune,ambi,diff,spec,shin,alpha);
+
+		glColor3f(1.0f,0.0f,0.0f);						/* Red*/
+		glVertex3f( 0.0f, 1.0f, 0.0f);					/* Top Of Triangle (Back)*/
+		glColor3f(0.0f,1.0f,0.0f);						/* Green*/
+		glVertex3f( 1.0f,-1.0f, -1.0f);					/* Left Of Triangle (Back)*/
+		glColor3f(0.0f,0.0f,1.0f);						/* Blue*/
+		glVertex3f(-1.0f,-1.0f, -1.0f);					/* Right Of Triangle (Back)*/
+			g3x_Material(rouge,ambi,diff,spec,shin,alpha);
+
+		glColor3f(1.0f,0.0f,0.0f);						/* Red*/
+		glVertex3f( 0.0f, 1.0f, 0.0f);					/* Top Of Triangle (Left)*/
+		glColor3f(0.0f,0.0f,1.0f);						/* Blue*/
+		glVertex3f(-1.0f,-1.0f,-1.0f);					/* Left Of Triangle (Left)*/
+		glColor3f(0.0f,1.0f,0.0f);						/* Green*/
+		glVertex3f(-1.0f,-1.0f, 1.0f);					/* Right Of Triangle (Left)*/
+	   
+glEnd();
+}
+
+void drawCylinder(){
+g3x_Material(rouge,ambi,diff,spec,shin,alpha);
+gluCylinder(gluNewQuadric(),0.5f,0.5f,1.0f,50,3);
+}
+
+
+
 /*= FONCTION DE DESSIN PRINCIPALE =*/
 static void Dessin(void)
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-		/* une sphere */
-  	g3x_Material(rouge,ambi,diff,spec,shin,1.);
-  	glutSolidSphere(rayon,40,40);
-  	/* un cube transparent */
-		/*--------------LIMITES DE LA TRANSPARENCE Gl ---------*/
-		/* -> TESTER :  DEFINIR LE CUBE TRANSP. AVANT LA SPHERE */
-		/* -> TESTER :  RENDRE LA SPHERE TRANSPARENTE           */
-  	g3x_Material(vert,ambi,diff,spec,shin,alpha);
-  	glutSolidCube(1.);
-	glDisable(GL_BLEND);
 	
+	
+		/* une sphere */
+  	/*g3x_Material(rouge,ambi,diff,spec,shin,1.);
+  	g3x_Material(vert,ambi,diff,spec,shin,alpha);*/
+	glDisable(GL_BLEND);
+
+    
+    glPushMatrix();
+   drawTriangle();
+
+	glPopMatrix();
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+/*
 
 	if (FLAG_TEAPOT)
 	{
@@ -69,10 +213,13 @@ static void Dessin(void)
     	glRotatef(90,1.,0.,0.);
     	g3x_Material(bleu,ambi,diff,spec,shin,1.);
 			glDisable(GL_CULL_FACE);
-    	glutSolidTeapot(.5);
+    	    	glutWireCube(.5);  
+		glutSolidCube(.5);
 			glEnable(GL_CULL_FACE);
   	glPopMatrix();
-	}	
+	}
+
+	
 	if (FLAG_TORUS)
 	{
   	glPushMatrix();
@@ -103,10 +250,10 @@ static void Dessin(void)
     	g3x_Material(magenta,ambi,diff,spec,shin,1.);
     	glutSolidIcosahedron();
   	glPopMatrix();
-	}		
+	}*/		
 
 	/* les cubes animes -> cf fonction <Anim> */
-	int i=0;
+/*	int i=0;
 	double a=360./MAXCOL;
   glPushMatrix();
 		glRotatef(-2.*b,0.,0.,W[2]);
@@ -122,8 +269,7 @@ static void Dessin(void)
  			glPopMatrix();
 			i++;
 		}
- 	glPopMatrix();
-	
+ 	glPopMatrix();*/	
 }
 
 /*=    ACTION A EXECUTER EN SORTIE   =*/
