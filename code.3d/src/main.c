@@ -11,7 +11,6 @@ void parser(char* chemin){
     size_t len = 0;
     ssize_t read;
     int maxOption = 5;
-    char* options[maxOption];
 
     fp = fopen(chemin, "r");
     if (fp == NULL)
@@ -19,16 +18,22 @@ void parser(char* chemin){
 	char* token;
     while ((read = getline(&line, &len, fp)) != -1) {
 		int cpt=0;
+		char* options[maxOption]=malloc(maxOption * sizeof(char));
         while ((token = strsep(&line, ","))!=NULL) {
 			options[cpt] = token;
 			printf(token);
+			printf("------");
 			cpt++;
+			
 		}
-		int i=0;
-	
+		printf("\n");
+
+		printf("boucle %d \n",strlen(options));
+		
 		if(createFigure(&elements, options)==-1){
-			return NULL;
+			
 		}
+		
     }
 
     fclose(fp);
