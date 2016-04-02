@@ -1,0 +1,6 @@
+triangle,1,2,3
+triangle,1,2,3
+triangle,1,2,3
+triangle,1,2,3
+triangle,1,2,3
+triangle,1,2,3

@@ -54,6 +54,7 @@ all : $(exec) clean
 	@echo "  headers        : $(incG3X)"
 clean : 
 	@rm -f *.o
-cleanall :
+#remplacer par cleanall après, je l'ai enlevé pour que ca soit rapide d'ecrire clean cl
+cl :
 	@rm -f *.o $(exec) *~ */*~
 	
