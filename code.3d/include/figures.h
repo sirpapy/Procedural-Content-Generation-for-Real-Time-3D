@@ -37,14 +37,12 @@ int createFigure(figures* list, char* data[]) {
 			options[0]=data[1];
 			options[1]=data[2];
 			options[2]=data[3];
-		}
-		
-	if(strcmp(data[0],"rectangle")==0){
+		}else if(strcmp(data[0],"rectangle")==0){
 		printf("Nombre d'element de données %d \n",(strlen(data)));
 		/*printf("%d",strlen(data));*/
 			printf("> ss %d ss <",strlen(data));
 			if(strlen(data)!=4){
-				printf("\nLa taille est inférieure pour un triangle\n");
+				printf("\nLa taille est inférieure pour un rectangle\n");
 				return -1;				
 			}
 			element = "rectangle";
@@ -53,12 +51,11 @@ int createFigure(figures* list, char* data[]) {
 			options[0]=data[1];
 			options[1]=data[2];
 			options[2]=data[3];
-		}
-	if(strcmp(data[0],"sphere")==0){
+		}else if(strcmp(data[0],"sphere")==0){
 		printf("Nombre d'element de données %d \n",(strlen(data)));
 		/*printf("%d",strlen(data));*/
 			if(strlen(data)!=4){
-				printf("\n La taille est inférieure pour un triangle\n");
+				printf("\n La taille est inférieure pour une sphere\n");
 				return -1;				
 			}
 			element = "sphere";
@@ -67,13 +64,12 @@ int createFigure(figures* list, char* data[]) {
 			options[0]=data[1];
 			options[1]=data[2];
 			options[2]=data[3];
-		}
-	if(strcmp(data[0],"cylindre")==0){
+		}else if(strcmp(data[0],"cylindre")==0){
 		printf("Nombre d'element de données %d \n",(strlen(data)));
 		/*printf("%d",strlen(data));*/
 		
 			if(strlen(data)!=4){
-				printf("\nLa taille est inférieure pour un triangle \n");
+				printf("\nLa taille est inférieure pour un cynclindre \n");
 				return -1;				
 			}
 			element = "cylindre";

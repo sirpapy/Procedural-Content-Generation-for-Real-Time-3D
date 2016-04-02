@@ -18,10 +18,9 @@ void parser(char* chemin){
 	char* token;
     while ((read = getline(&line, &len, fp)) != -1) {
 		int cpt=0;
-		char* options[maxOption]=malloc(maxOption * sizeof(char));
+		char* options[maxOption];
         while ((token = strsep(&line, ","))!=NULL) {
 			options[cpt] = token;
-			printf(token);
 			printf("------");
 			cpt++;
 			
@@ -33,12 +32,16 @@ void parser(char* chemin){
 		if(createFigure(&elements, options)==-1){
 			
 		}
-		
-    }
-
+		int i = 0;
+		for(i = 0;i<strlen(options);i++){
+			/*printf("%s",options[i]);*/
+			options[i]=NULL;
+		  }
+}
     fclose(fp);
     if (line)
         free(line);
+
 }
 
 
