@@ -24,7 +24,7 @@ Vect getPlaneNormal(){
 double getPlaneDistance(){
 	return distance;
 }
-Color getPlaneColor(){
+Color getColor(){
 	return color;
 };
 
@@ -32,7 +32,7 @@ Vect getNormalAt(Vect point){
 	return normal;
 }
 
-double findIntersection(Ray ray){
+virtual double findIntersection(Ray ray){
 	Vect ray_direction = ray.getRayDirection();
 	
 	//produit scalaire entre la provenance du rayon et le vecteur normal

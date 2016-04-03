@@ -3,9 +3,10 @@
 
 
 class Ray {
-	Vect origin, direction;
 	
 	public:
+	Vect origin, direction;
+
 	Ray ();
 	
 	Ray(Vect,Vect);

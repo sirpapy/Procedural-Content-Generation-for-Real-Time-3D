@@ -26,7 +26,7 @@ Vect getSphereCenter(){
 double getSphereRadius(){
 	return radius;
 }
-Color getSphereColor(){
+Color getColor(){
 	return color;
 	
 }
@@ -36,7 +36,7 @@ Vect getNormalAt(Vect point){
 	Vect normal_Vect = point.vectAdd(center.negative()).normalize();
 	return normal_Vect;
 }
-double findIntersection(Ray ray){
+virtual double findIntersection(Ray ray){
 	Vect ray_origin = ray.getRayOrigin();
 	double ray_origin_x = ray_origin.getVectX();
 	double ray_origin_y = ray_origin.getVectY();
@@ -61,14 +61,14 @@ double findIntersection(Ray ray){
 		/// The ray intersects the sphere
 		//Si le rayon intersect avec la sphere il peut le faire sur les deux faces. on doit récuperer la premiere face
 		//first root(face)
-		double root_1 = ((-1*b - sqrt(discriminant))/2) - 0.00001; //0.00001 arbritraire
+		double root_1 = ((-1*b - sqrt(discriminant))/2) - 0.0000001; //0.000001 arbritraire
 		if(root_1 > 0){
 			//The first root is the smallest positive root
 			return root_1;
 		}
 		else{
 			//the second root is the smallest positive root
-			double root_2 = ((sqrt(discriminant) - b)/2)- 0.00001;
+			double root_2 = ((sqrt(discriminant) - b)/2)- 0.0000001;
 			return root_2;
 		}
 	}else{
@@ -83,7 +83,7 @@ double findIntersection(Ray ray){
 
 Sphere::Sphere (){
 	center =  Vect(0,0,0);
-	radius = 1;
+	radius = 1.0;
 	color =  Color(0.5,0.5,0.5, 0);
 }
 

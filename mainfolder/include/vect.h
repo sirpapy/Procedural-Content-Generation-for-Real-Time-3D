@@ -4,9 +4,9 @@
 #include "math.h"
 
 class Vect {
-	double x,y,z;
 	
 	public:
+	double x,y,z;
 	Vect ();
 	
 	Vect(double,double,double);

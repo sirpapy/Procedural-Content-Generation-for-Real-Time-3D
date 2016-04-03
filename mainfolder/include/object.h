@@ -15,11 +15,12 @@ class Object {
 	
 	//method functions
 	
-Color getObjectColor(){
+virtual Color getColor(){
 	return Color(0.0, 0.0, 0.0, 0);
   };
+ virtual Vect getNormalAt(Vect point) {return Vect(0,0,0);}
   
-  double findIntersection(Ray ray){
+ virtual double findIntersection(Ray ray){
 	  return 0;
   }
 };

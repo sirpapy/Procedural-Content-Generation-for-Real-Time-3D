@@ -102,7 +102,7 @@ int winningObjectIndex(vector<double> object_intersections){
 	//return the index of the winning intersection
 	int index_of_minimum_value;
 	
-	
+
 	//prevent unnecessary calculations
 	if(object_intersections.size() == 0){
 		//if there is no intersections
@@ -118,6 +118,7 @@ int winningObjectIndex(vector<double> object_intersections){
 			
 		}
 	}else{
+		
 		//otherwise there is more than on intersection
 		//first find the maximum value
 		double max = 0;
@@ -126,15 +127,19 @@ int winningObjectIndex(vector<double> object_intersections){
 				max = object_intersections.at(i);
 			}
 		}
+
 		//then starting from the maximum value and find the minimum positive value
 		if (max > 0){
+
 			// we only want positive intersection
 			for(int index = 0; index < object_intersections.size(); index++){
 				if(object_intersections.at(index) > 0 && object_intersections.at(index) <= max ){
 					max = object_intersections.at(index);
 					index_of_minimum_value = index;
+
 			}
 	}
+
 	return index_of_minimum_value;
 	
 }else{
@@ -214,7 +219,7 @@ int main(int argc, char* argv[]){
 	vector<Object*> scene_objects;
 	scene_objects.push_back(dynamic_cast<Object*> (&scene_sphere));
 	scene_objects.push_back(dynamic_cast<Object*> (&scene_plane));
-	
+
 	
 	
 	
@@ -233,11 +238,11 @@ int main(int argc, char* argv[]){
 			if(width > height){
 				//the image is wider than it is tall
 				xamnt = ((x+0.5)/width)*aspectratio - (((width - height)/(double)height)/2);
-				xamnt = ((height-y) + 0.5)/height;
+				yamnt = ((height-y) + 0.5)/height;
 				}else if(height > width){
 					//the image is taller than it is wide
 					xamnt = (x+0.5)/width;
-					yamnt = (((height - y) + 0.5)/height/aspectratio - (((height - width)/(double) width)/2));
+					yamnt = (((height - y) + 0.5)/height) /aspectratio - (((height - width)/(double) width)/2);
 				}
 				else{
 					//the image is square
@@ -246,7 +251,7 @@ int main(int argc, char* argv[]){
 				}
 			//l'origine de nos rayons sera l'origine de notre camera
 			Vect cam_ray_origin = scene_cam.getCameraPostion();
-			Vect cam_ray_direction = cameradirection.vectAdd(cameraright.vectMult(xamnt - 0.5).vectAdd(cameradown.vectMult(yamnt - 0.5)).normalize());
+			Vect cam_ray_direction = cameradirection.vectAdd(cameraright.vectMult(xamnt - 0.5).vectAdd(cameradown.vectMult(yamnt - 0.5))).normalize();
 			Ray cam_ray (cam_ray_origin, cam_ray_direction);
 			vector<double> intersections;
 			
@@ -257,7 +262,7 @@ int main(int argc, char* argv[]){
 			}
 			//the object closest to the camera
 			int index_of_winning_object = winningObjectIndex(intersections);
-			
+			//cout << index_of_winning_object;
 			//return color
 			if((x>200) && (x<440) && (y>200 && y<280)){
 				
