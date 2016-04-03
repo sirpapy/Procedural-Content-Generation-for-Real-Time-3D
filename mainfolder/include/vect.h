@@ -48,7 +48,7 @@ Vect vectAdd(Vect v){
 }
 
 Vect vectMulti(double scalar){
-	return Vect (x+v.getVectX(), y+v.getVectY(), z+v.getVectZ());
+	return Vect (x*scalar, y*scalar, z*scalar);
 }
 	
 };

@@ -16,6 +16,8 @@
 #include <include/vect.h>
 #include <include/ray.h>
 #include <include/camera.h>
+#include <include/light.h>
+#include <include/color.h>
 
 
 using namespace std;
@@ -108,6 +110,24 @@ int main(int argc, char* argv[]){
 	Vect X (1,0,0);
 	Vect Y (0,1,0);
 	Vect Z (0,0,1);
+	
+	Vect camposition (3,1.5,-4);
+	
+	//le point ou la camera va regarder
+	Vect look_at (0,0,0);
+	Vect diff_btw(camposition.getVectX() - look_at.getVectX(), camposition.getVectY() - look_at.getVectY(),camposition.getVectZ() - look_at.getVectZ());
+	
+	
+	
+	//Là ou la camera va regarder. Difference entre le point ou la camera va regarder et la camera
+	Vect cameradirection = diff_btw.negative().normalize();
+	
+	
+	Vect cameraright = Y.crossProduct(cameradirection).normalize();
+	Vect cameradown = cameraright.crossProduct(cameradirection).normalize();
+	Camera scene_cam(camposition, cameradirection, cameraright, cameradown);
+	
+	
 	
 	
 	for(int x=0; x<width; x++){
