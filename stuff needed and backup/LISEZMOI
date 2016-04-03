@@ -1,0 +1,54 @@
+
+==================================================================================
+
+8 Décembre 2014
+
+==================================================================================
+
+E.Incerti - incerti@upem.fr
+Universite de Paris-Est/Marne-la-Vallee
+
+==================================================================================
+
+Installation des librairie <g2x> et <g3x>, sur-couches à OpenGl
+Exemples d'utilisation OpenGl/g2x/g3x
+
+==================================================================================
+
+CONTENU
+- ce fichier README
+
+- un script d'installation install.sh
+
+- un repertoire libg2x/
+	Ce repertoire contient 2 versions de la lib <g2x> : 
+  	- libg2x.32b.so     : lib. dynamique 32 bits
+  	- libg2x.64b.so     : lib. dynamique 64 bits
+		- un repertoire include/  contient les fichiers d'en-tête de la lib. 
+
+- un repertoire code.2d/
+		- un repertoire include/ (vide) 
+		- un repertoire src/ quelques codes d'exemple
+		- un Makefile
+
+- un repertoire libg3x/
+	Ce repertoire contient 2 versions de la lib <g3x> : 
+  	- libg3x.32b.so     : lib. dynamique 32 bits
+  	- libg3x.64b.so     : lib. dynamique 64 bits
+		- un repertoire include/  contient les fichiers d'en-tête de la lib. 
+
+- un repertoire code.3d/
+		- un repertoire include/ (vide) 
+		- un repertoire src/ quelques codes d'exemple
+		- un Makefile
+
+==================================================================================
+
+UTILISATION 
+- dans le repertoire courant, lancer le script d'installation : ./install.sh
+  ATTENTION : Ce script va modifier (ou creer) le fichier de configuration ~/.bashrc 
+    * Des variables d'environnement sont crees pour la compilation.
+      Ces variables sont definies par rapport au REPERTOIRE COURANT D'INSTALLATION
+      => en cas de deplacement du repertoire, il faut recommencer l'install.
+  
+
