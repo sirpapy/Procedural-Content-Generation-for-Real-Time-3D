@@ -16,8 +16,8 @@
 #include <include/vect.h>
 #include <include/ray.h>
 #include <include/camera.h>
-#include <include/light.h>
 #include <include/color.h>
+#include <include/light.h>
 
 
 using namespace std;
@@ -127,6 +127,14 @@ int main(int argc, char* argv[]){
 	Vect cameradown = cameraright.crossProduct(cameradirection).normalize();
 	Camera scene_cam(camposition, cameradirection, cameraright, cameradown);
 	
+	Color white_light(1.0,1.0,1.0,0);
+	Color pretty_green(0.5, 1.0, 0.5, 0.3);
+	Color gray (0.5,0.5,0.5,0);
+	Color black (0.0,0.0,0.0,0);
+	
+	//source de lumière
+	Vect light_position( -7,10,-10);
+	Light scene_light (light_position, white_light);
 	
 	
 	
