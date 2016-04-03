@@ -1,6 +1,6 @@
 
-#ifndef Camera_H
-#define _Camera_H
+#ifndef _CAMERA_H
+#define _CAMERA_H
 
 
 class Camera {

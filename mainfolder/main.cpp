@@ -18,6 +18,9 @@
 #include <include/camera.h>
 #include <include/color.h>
 #include <include/light.h>
+#include <include/sphere.h>
+#include <include/object.h>
+#include <include/plane.h>
 
 
 using namespace std;
@@ -107,6 +110,8 @@ int main(int argc, char* argv[]){
 	
 	int n = width*height;
 	RGBType *pixels = new RGBType[n];
+	
+	Vect O (0,0,0);
 	Vect X (1,0,0);
 	Vect Y (0,1,0);
 	Vect Z (0,0,1);
@@ -129,12 +134,26 @@ int main(int argc, char* argv[]){
 	
 	Color white_light(1.0,1.0,1.0,0);
 	Color pretty_green(0.5, 1.0, 0.5, 0.3);
+	Color maroon(0.5,0.25,0.25,0);
 	Color gray (0.5,0.5,0.5,0);
 	Color black (0.0,0.0,0.0,0);
 	
 	//source de lumière
 	Vect light_position( -7,10,-10);
 	Light scene_light (light_position, white_light);
+	
+	
+	
+	
+	
+	//Creation de la sphere
+	Sphere scene_sphere (O, 1, pretty_green);
+	Plane scene_plane (Y,-1, maroon);
+	
+	
+	
+	
+	
 	
 	
 	
@@ -147,6 +166,10 @@ int main(int argc, char* argv[]){
 			pixels[thisone].r = 23;
 			pixels[thisone].g = 222;
 			pixels[thisone].b = 10;
+		}else{
+			pixels[thisone].r = 0;
+			pixels[thisone].g = 0;
+			pixels[thisone].b = 0;
 		}
 			
 			

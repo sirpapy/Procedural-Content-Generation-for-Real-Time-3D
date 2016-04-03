@@ -1,4 +1,4 @@
-#ifndef VECT_H
+#ifndef _VECT_H
 #define _VECT_H
 
 #include "math.h"
@@ -47,7 +47,7 @@ Vect vectAdd(Vect v){
 	return Vect (x+v.getVectX(), y+v.getVectY(), z+v.getVectZ());
 }
 
-Vect vectMulti(double scalar){
+Vect vectMult(double scalar){
 	return Vect (x*scalar, y*scalar, z*scalar);
 }
 	

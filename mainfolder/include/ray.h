@@ -1,4 +1,4 @@
-#ifndef RAY_H
+#ifndef _RAY_H
 #define _RAY_H
 
 

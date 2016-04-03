@@ -1,4 +1,4 @@
-#ifndef Light_H
+#ifndef _Light_H
 #define _Light_H
 
 
