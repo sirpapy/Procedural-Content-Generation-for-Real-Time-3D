@@ -13,8 +13,12 @@
 #include <stdio.h>
 #include <time.h>
 
-using namespace std;
+#include <include/vect.h>
+#include <include/ray.h>
+#include <include/camera.h>
 
+
+using namespace std;
 
 
 struct RGBType{
@@ -101,6 +105,10 @@ int main(int argc, char* argv[]){
 	
 	int n = width*height;
 	RGBType *pixels = new RGBType[n];
+	Vect X (1,0,0);
+	Vect Y (0,1,0);
+	Vect Z (0,0,1);
+	
 	
 	for(int x=0; x<width; x++){
 		for(int y = 0; y<height;y++){
