@@ -21,6 +21,7 @@ virtual Color getColor(){
  virtual Vect getNormalAt(Vect point) {return Vect(0,0,0);}
   
  virtual double findIntersection(Ray ray){
+
 	  return 0;
   }
 };

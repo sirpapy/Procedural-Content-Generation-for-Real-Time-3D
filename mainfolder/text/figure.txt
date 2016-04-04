@@ -1,4 +1,1 @@
-sphere:1,2,4:4
-triangle:1:2:3
-rectangle:1:2:3
-cylindre:1:2:3
+sphere:0,1,0:4

@@ -33,6 +33,7 @@ Vect getNormalAt(Vect point){
 }
 
 virtual double findIntersection(Ray ray){
+
 	Vect ray_direction = ray.getRayDirection();
 	
 	//produit scalaire entre la provenance du rayon et le vecteur normal

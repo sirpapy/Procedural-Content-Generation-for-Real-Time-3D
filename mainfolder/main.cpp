@@ -36,6 +36,12 @@ struct RGBType {
     double b;
 };
 
+Color white_light(1.0, 1.0, 1.0, 0);
+Color pretty_green(0.5, 1.0, 0.5, 0.3);
+Color maroon(0.5, 0.25, 0.25, 0);
+Color gray(0.5, 0.5, 0.5, 0);
+Color black(0.0, 0.0, 0.0, 0);
+
 
 vector<string> split(string str, char delimiter) {
     vector<string> internal;
@@ -49,34 +55,6 @@ vector<string> split(string str, char delimiter) {
     return internal;
 }
 
-void parser(vector<object*> liste) {
-    string line;
-    ifstream myfile("text/figure.txt");
-    if (myfile.is_open()) {
-        while (getline(myfile, line)) {
-            vector<string> sep = split(line, ':');
-            if(sep.at(0)=="triangle"){
-                //cout << "Un triangle";
-            } else if(sep.at(0)=="rectangle"){
-                //cout << "Un rectangle";
-            }else if(sep.at(0)=="sphere"){
-               vector<string> vectorOfSphere = split(sep.at(1),',');
-                Vect center(std::stod(vectorOfSphere.at(0)),stod(vectorOfSphere.at(1)),stod(vectorOfSphere.at(2)));
-                //cout << center.getVectY();
-                // cout << "Une sphere" ;
-            }else if(sep.at(0) == "cylindre"){
-                //cout << "Un cylindre" ;
-            }
-
-            /*for (int i = 0; i < sep.size(); i++) {
-                cout << sep.at(i)<<";";
-            }*/
-        }
-        myfile.close();
-    }
-
-    else cout << "Unable to open file";
-}
 
 
 void savebmp(const char *filename, int w, int h, int dpi, RGBType *data) {
@@ -196,7 +174,42 @@ int winningObjectIndex(vector<double> object_intersections) {
 
 
 int thisone;
+/*
+vector<Object*> parser() {
+    string line;
+    ifstream myfile("text/figure.txt");
+    if (myfile.is_open()) {
+        while (getline(myfile, line)) {
+            vector<string> sep = split(line, ':');
+            if(sep.at(0)=="triangle"){
+                //cout << "Un triangle";
+            } else if(sep.at(0)=="rectangle"){
+                //cout << "Un rectangle";
+            }else if(sep.at(0)=="sphere"){
+                vector<string> vectorOfSphere = split(sep.at(1),',');
+                Vect center(std::stod(vectorOfSphere.at(0)),stod(vectorOfSphere.at(1)),stod(vectorOfSphere.at(2)));
+                Sphere scene_sphere(center, 1, pretty_green);
+                scene_objects.push_back(dynamic_cast<Object *> (&scene_sphere));
 
+                //cout << center.getVectY();
+                // cout << "Une sphere" ;
+            }else if(sep.at(0) == "cylindre"){
+                //cout << "Un cylindre" ;
+            }
+
+            /*for (int i = 0; i < sep.size(); i++) {
+                cout << sep.at(i)<<";";
+            }*/
+ /*       }
+        myfile.close();
+    }
+
+    else {
+        cout << "Unable to open file";
+
+    }
+}
+*/
 
 int main(int argc, char *argv[]) {
 
@@ -235,11 +248,7 @@ int main(int argc, char *argv[]) {
     Vect cameradown = cameraright.crossProduct(cameradirection).normalize();
     Camera scene_cam(camposition, cameradirection, cameraright, cameradown);
 
-    Color white_light(1.0, 1.0, 1.0, 0);
-    Color pretty_green(0.5, 1.0, 0.5, 0.3);
-    Color maroon(0.5, 0.25, 0.25, 0);
-    Color gray(0.5, 0.5, 0.5, 0);
-    Color black(0.0, 0.0, 0.0, 0);
+
 
     //source de lumière
     Vect light_position(-7, 10, -10);
@@ -250,12 +259,82 @@ int main(int argc, char *argv[]) {
 
 
     //Creation de la sphere
-    Sphere scene_sphere(O, 1, pretty_green);
+    //Sphere scene_sphere(O, 1, pretty_green);
     Plane scene_plane(Y, -1, maroon);
-    vector<Object *> scene_objects;
-    scene_objects.push_back(dynamic_cast<Object *> (&scene_sphere));
-    scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
 
+
+
+    vector<Object *> scene_objects;
+
+
+
+
+
+
+
+    string line;
+    ifstream myfile("text/figure.txt");
+    if (myfile.is_open()) {
+        cout <<"salut";
+        while (getline(myfile, line)) {
+            vector<string> sep = split(line, ':');
+            if(sep.at(0)=="triangle"){
+                //cout << "Un triangle";
+            } else if(sep.at(0)=="rectangle"){
+                //cout << "Un rectangle";
+            }else if(sep.at(0)=="sphere"){
+                vector<string> vectorOfSphere = split(sep.at(1),',');
+                Vect center(std::stod(vectorOfSphere.at(0)),stod(vectorOfSphere.at(1)),stod(vectorOfSphere.at(2)));
+                Sphere scene_sphere(center, 1, pretty_green);
+                cout <<"Pour la sphere " << scene_sphere.getSphereCenter().getVectX()<< " - "<< scene_sphere.getSphereCenter().getVectY()<< " - "<< scene_sphere.getSphereCenter().getVectZ()<< " - "<< scene_sphere.getSphereRadius()<<endl;
+                scene_objects.push_back(dynamic_cast<Object *> (&scene_sphere));
+
+                break;
+                //cout << center.getVectY();
+                // cout << "Une sphere" ;
+            }else if(sep.at(0) == "cylindre"){
+                //cout << "Un cylindre" ;
+            }
+
+            /*for (int i = 0; i < sep.size(); i++) {
+                cout << sep.at(i)<<";";
+            }*/
+        }
+        myfile.close();
+    }
+
+    else {
+        cout << "Unable to open file";
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
 
     double xamnt, yamnt;
 
@@ -289,7 +368,9 @@ int main(int argc, char *argv[]) {
             //Maintenant on fait une boucle pour voir si le rayon qu'on vient de creer va avoir une
             //intersection avec nos objects
             for (int index = 0; index < scene_objects.size(); index++) {
-                intersections.push_back(scene_objects.at(index)->findIntersection(cam_ray));
+                //cout << index<<endl;
+                intersections.push_back(scene_objects.at(0)->findIntersection(cam_ray));
+
             }
             //the object closest to the camera
             int index_of_winning_object = winningObjectIndex(intersections);
@@ -313,7 +394,6 @@ int main(int argc, char *argv[]) {
     }
 
     savebmp("scene.bmp", width, height, dpi, pixels);
-    parser();
     return 0;
 
 

@@ -32,11 +32,16 @@ Color getColor(){
 }
 
 Vect getNormalAt(Vect point){
+	std::cout << "salutttttttttttttttt"<<std::endl;
+
 	//normal  always points away from the center of a sphere
 	Vect normal_Vect = point.vectAdd(center.negative()).normalize();
 	return normal_Vect;
 }
 virtual double findIntersection(Ray ray){
+	std::cout << "salutttttttttttttttt"<<std::endl;
+
+
 	Vect ray_origin = ray.getRayOrigin();
 	double ray_origin_x = ray_origin.getVectX();
 	double ray_origin_y = ray_origin.getVectY();
@@ -46,7 +51,7 @@ virtual double findIntersection(Ray ray){
 	double ray_direction_x = ray_direction.getVectX();
 	double ray_direction_y = ray_direction.getVectY();
 	double ray_direction_z = ray_direction.getVectZ();
-	
+
 	Vect sphere_center = center;
 	double sphere_center_x = sphere_center.getVectX();
 	double sphere_center_y = sphere_center.getVectY();
@@ -55,7 +60,6 @@ virtual double findIntersection(Ray ray){
 	double a = 1; //normalized (a verifier)
 	double b = (2*(ray_origin_x - sphere_center_x)*ray_direction_x) + (2*(ray_origin_y - sphere_center_y)*ray_direction_y) + (2*(ray_origin_z - sphere_center_z)*ray_direction_z);
 	double c = pow(ray_origin_x - sphere_center_x, 2) + pow(ray_origin_y - sphere_center_y, 2) +pow(ray_origin_z - sphere_center_z, 2) - (radius*radius);
-	
 	double discriminant = b*b - 4*c;
 	if(discriminant > 0){
 		/// The ray intersects the sphere
@@ -88,6 +92,7 @@ Sphere::Sphere (){
 }
 
 Sphere::Sphere (Vect centerValue, double radiusValue, Color colorValue){
+
 	center = centerValue;
 	color = colorValue;
 	radius = radiusValue;
