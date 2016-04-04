@@ -32,14 +32,12 @@ Color getColor(){
 }
 
 Vect getNormalAt(Vect point){
-	std::cout << "salutttttttttttttttt"<<std::endl;
 
 	//normal  always points away from the center of a sphere
 	Vect normal_Vect = point.vectAdd(center.negative()).normalize();
 	return normal_Vect;
 }
 virtual double findIntersection(Ray ray){
-	std::cout << "salutttttttttttttttt"<<std::endl;
 
 
 	Vect ray_origin = ray.getRayOrigin();

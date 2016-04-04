@@ -25,6 +25,7 @@
 #include "include/camera.h"
 #include "include/light.h"
 #include "include/plane.h"
+#include "include/triangle.h"
 
 
 using namespace std;
@@ -35,6 +36,8 @@ struct RGBType {
     double g;
     double b;
 };
+
+void Parser(vector<Object *> &scene_objects);
 
 Color white_light(1.0, 1.0, 1.0, 0);
 Color pretty_green(0.5, 1.0, 0.5, 0.3);
@@ -267,74 +270,10 @@ int main(int argc, char *argv[]) {
     vector<Object *> scene_objects;
 
 
+     Parser(scene_objects);
 
 
-
-
-
-    string line;
-    ifstream myfile("text/figure.txt");
-    if (myfile.is_open()) {
-        cout <<"salut";
-        while (getline(myfile, line)) {
-            vector<string> sep = split(line, ':');
-            if(sep.at(0)=="triangle"){
-                //cout << "Un triangle";
-            } else if(sep.at(0)=="rectangle"){
-                //cout << "Un rectangle";
-            }else if(sep.at(0)=="sphere"){
-                vector<string> vectorOfSphere = split(sep.at(1),',');
-                Vect center(std::stod(vectorOfSphere.at(0)),stod(vectorOfSphere.at(1)),stod(vectorOfSphere.at(2)));
-                Sphere scene_sphere(center, 1, pretty_green);
-                cout <<"Pour la sphere " << scene_sphere.getSphereCenter().getVectX()<< " - "<< scene_sphere.getSphereCenter().getVectY()<< " - "<< scene_sphere.getSphereCenter().getVectZ()<< " - "<< scene_sphere.getSphereRadius()<<endl;
-                scene_objects.push_back(dynamic_cast<Object *> (&scene_sphere));
-
-                break;
-                //cout << center.getVectY();
-                // cout << "Une sphere" ;
-            }else if(sep.at(0) == "cylindre"){
-                //cout << "Un cylindre" ;
-            }
-
-            /*for (int i = 0; i < sep.size(); i++) {
-                cout << sep.at(i)<<";";
-            }*/
-        }
-        myfile.close();
-    }
-
-    else {
-        cout << "Unable to open file";
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
+     scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
 
     double xamnt, yamnt;
 
@@ -367,9 +306,9 @@ int main(int argc, char *argv[]) {
 
             //Maintenant on fait une boucle pour voir si le rayon qu'on vient de creer va avoir une
             //intersection avec nos objects
+
             for (int index = 0; index < scene_objects.size(); index++) {
-                //cout << index<<endl;
-                intersections.push_back(scene_objects.at(0)->findIntersection(cam_ray));
+                intersections.push_back(scene_objects.at(index)->findIntersection(cam_ray));
 
             }
             //the object closest to the camera
@@ -397,4 +336,44 @@ int main(int argc, char *argv[]) {
     return 0;
 
 
+}
+
+void Parser(vector<Object *> &scene_objects) {
+    string line;
+    ifstream myfile("text/figure.txt");
+    if (myfile.is_open()) {
+       cout <<"salut";
+       while (getline(myfile, line)) {
+           vector<string> sep = split(line, ':');
+           if(sep.at(0)=="triangle"){
+               //cout << "Un triangle";
+           } else if(sep.at(0)=="rectangle"){
+               //cout << "Un rectangle";
+           }else if(sep.at(0)=="sphere"){
+               vector<string> vectorOfSphere = split(sep.at(1),',');
+               Vect center(stod(vectorOfSphere.at(0)), stod(vectorOfSphere.at(1)), stod(vectorOfSphere.at(2)));
+               Sphere *scene_sphere = new Sphere(center, 1, pretty_green);
+
+               scene_objects.push_back(scene_sphere);
+
+               //cout <<"Pour la sphere " << scene_sphere.getSphereCenter().getVectX()<< " - "<< scene_sphere.getSphereCenter().getVectY()<< " - "<< scene_sphere.getSphereCenter().getVectZ()<< " - "<< scene_sphere.getSphereRadius()<<endl;
+
+               break;
+               //cout << center.getVectY();
+               // cout << "Une sphere" ;
+           }else if(sep.at(0) == "cylindre"){
+               //cout << "Un cylindre" ;
+           }
+
+           /*for (int i = 0; i < sep.size(); i++) {
+               cout << sep.at(i)<<";";
+           }*/
+       }
+       myfile.close();
+   }
+
+   else {
+       cout << "Unable to open file";
+
+   }
 }
