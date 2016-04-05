@@ -1,5 +1,5 @@
-#ifndef _TRIANGLE_H
-#define _TRIANGLE_H
+#ifndef _RECTANGLE_H
+#define _RECTANGLE_H
 
 
 
@@ -8,7 +8,7 @@
 #include "ray.h"
 
 
-class Triangle : public Object{
+class Rectangle : public Object{
 	Vect A,B,C;
 	Vect CA;
 	Vect BA;
@@ -16,9 +16,9 @@ class Triangle : public Object{
 	Color color;
 	
 	public:
-	Triangle ();
+	Rectangle ();
 	
-	Triangle(Vect, Vect, Vect, Color);
+	Rectangle(Vect, Vect, Vect, Color);
 	
 	//method functions
 
@@ -71,10 +71,10 @@ double a = ray_direction.dotProduct(getNormal());
 
 
 		if((test1>=0)&& (test2>=0) && (test3>=0)) {
-			//inside triangle
+			//inside Rectangle
 			return -1 * b / a;
 		}else{
-			//outsite the triangle
+			//outsite the Rectangle
 			return -1;
 		}
 
@@ -85,7 +85,7 @@ double a = ray_direction.dotProduct(getNormal());
 
 };
 
-Triangle::Triangle (){
+Rectangle::Rectangle (){
 A = Vect(1,0,0);
 C = Vect(0,0,1);
 B = Vect(0,1,0);
@@ -94,7 +94,7 @@ color =  Color(0.5,0.5,0.5, 0);
 
 }
 
-Triangle::Triangle (Vect a, Vect b, Vect c, Color co){
+Rectangle::Rectangle (Vect a, Vect b, Vect c, Color co){
 A = a;
 	B = b;
 	C = c;

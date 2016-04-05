@@ -2,6 +2,12 @@
 #define _COLOR_H
 
 
+struct RGBType{
+	double r;
+	double g;
+	double b;
+};
+
 class Color {
 	double red,green, blue, special;
 	
@@ -9,7 +15,6 @@ class Color {
 	Color ();
 	
 	Color(double,double,double, double);
-	
 	//method functions
 	
 	double getColorRed(){
@@ -34,6 +39,14 @@ double setColorGreen(double greenValue){
 double setColorBlue(double blueValue){
 	blue = blueValue;
 };
+RGBType returnForPixelColor(){
+	RGBType *rgbType = new RGBType[0];
+			rgbType[0].r = red;
+			rgbType[0].g = green;
+			rgbType[0].b = blue;
+
+	return *rgbType;
+}
 double setColorSpecial(double specialValue){
 special = specialValue;
 };
