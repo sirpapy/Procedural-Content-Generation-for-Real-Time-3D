@@ -26,6 +26,7 @@
 #include "include/light.h"
 #include "include/plane.h"
 #include "include/triangle.h"
+#include "include/cylinder.h"
 #include "include/file.h"
 
 
@@ -72,13 +73,12 @@ double findMaxValue(vector<double> list){
 
 
 int closestObject(vector<double> object_intersections) {
-    //return the index of the winning intersection
+
     int minIndex;
 
 
-    //prevent unnecessary calculations
     if (object_intersections.size() == 0) {
-        //if there is no intersectionsn
+        //Il n'y a pas eu d'intersection
         return -1;
     }
     else if (object_intersections.size() == 1) {
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
     Vect Y(0, 1, 0);
     Vect Z(0, 0, 1);
 
-    Vect cameraPosition(7, 1.5, -4);
+    Vect cameraPosition(-7, 1.5, -4);
 
     //le point ou la camera va regarder
     Vect pointToLook(0, 0, 0);
@@ -187,18 +187,14 @@ int main(int argc, char *argv[]) {
         for (int y = 0; y < height; y++) {
             thisone = y * width + x;
 
-            //start with no anti-aliasing
             if (width > height) {
-                //the image is wider than it is tall
                 xamnt = ((x + 0.5) / width) * aspectratio - (((width - height) / (double) height) / 2);
                 yamnt = ((height - y) + 0.5) / height;
             } else if (height > width) {
-                //the image is taller than it is wide
                 xamnt = (x + 0.5) / width;
                 yamnt = (((height - y) + 0.5) / height) / aspectratio - (((height - width) / (double) width) / 2);
             }
             else {
-                //the image is square
                 xamnt = (x + 0.5) / width;
                 yamnt = ((height - y) + 0.5) / height;
             }
@@ -214,7 +210,6 @@ int main(int argc, char *argv[]) {
 
             for (int index = 0; index < scene_objects.size(); index++) {
                 intersections.push_back(scene_objects.at(index)->findIntersection(cam_ray));
-
             }
             //the object closest to the camera
             int index_of_closest_Object = closestObject(intersections);
@@ -267,17 +262,11 @@ void Parser(vector<Object *> &scene_objects) {
 
                scene_objects.push_back(scene_sphere);
 
-               //cout <<"Pour la sphere " << scene_sphere.getSphereCenter().getVectX()<< " - "<< scene_sphere.getSphereCenter().getVectY()<< " - "<< scene_sphere.getSphereCenter().getVectZ()<< " - "<< scene_sphere.getSphereRadius()<<endl;
-
-               //cout << center.getVectY();
-               // cout << "Une sphere" ;
            }else if(sep.at(0) == "cylindre"){
+               Cylinder *cylinder = new Cylinder();
+               scene_objects.push_back(cylinder);
                //cout << "Un cylindre" ;
            }
-
-           /*for (int i = 0; i < sep.size(); i++) {
-               cout << sep.at(i)<<";";
-           }*/
        }
        myfile.close();
    }
