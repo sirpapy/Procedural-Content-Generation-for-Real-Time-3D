@@ -42,7 +42,7 @@ public:
 
         float b24ac = b*b - 4*a*c;
         if (b24ac<0)
-            return false;
+            return -1;
 
         float sqb24ac = sqrtf(b24ac);
         t0 = (-b + sqb24ac) / (2 * a);
@@ -64,7 +64,7 @@ public:
 
                 Vect mHitPosition = start.vectAdd(direction.vectMult(th));
                 Vect  mNormal = Vect(0, -1, 0);
-                return 1;
+            return 1;
             }
         }
         else if (y0>=-1 && y0<=1)
@@ -74,7 +74,7 @@ public:
 
             Vect mHitPosition = start.vectAdd(direction.vectMult(t0));
 
-            return 1;
+        return 1;
         }
         else if (y0>1)
         {
@@ -89,11 +89,11 @@ public:
 
                 Vect mHitPosition = start.vectAdd(direction.vectMult(th));
                 Vect mNormal = Vect(0, 1, 0);
-                return 1;
+            return 1;
             }
         }
 
-        return false;
+        return -1;
     }
 
 
