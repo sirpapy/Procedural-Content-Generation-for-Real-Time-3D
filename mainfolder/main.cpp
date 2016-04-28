@@ -27,6 +27,7 @@
 #include "include/plane.h"
 #include "include/triangle.h"
 #include "include/cylinder.h"
+#include "include/rectangle.h"
 #include "include/file.h"
 
 
@@ -254,7 +255,10 @@ void Parser(vector<Object *> &scene_objects) {
 
                scene_objects.push_back(scene_triangle);
            } else if(sep.at(0)=="rectangle"){
-               //cout << "Un rectangle";
+
+               Rectangle *rectange = new Rectangle();
+               scene_objects.push_back(rectange);
+
            }else if(sep.at(0)=="sphere"){
                vector<string> vectorOfSphere = split(sep.at(1),',');
                Vect center(stod(vectorOfSphere.at(0)), stod(vectorOfSphere.at(1)), stod(vectorOfSphere.at(2)));
