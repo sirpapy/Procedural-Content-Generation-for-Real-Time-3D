@@ -18,7 +18,7 @@ public:
 
     Rectangle();
 
-    Rectangle(Vect, Vect, Color);
+    Rectangle(Vect, double, double, Color);
     Color getColor() { return color; }
 
     double findIntersection(Ray ray) {
@@ -62,15 +62,20 @@ public:
 };
 
 Rectangle::Rectangle() {
+    double longueur = 3;
+    double largeur = 3;
+    Vect centre = Vect(0,0,5);
 
-    min = Vect(5, -2, 5);
-    max = Vect(5, 4,2);
-    color = Color(0.0, 0.8, 0.4, 0.0);
+
+    min = Vect(centre.getVectX()-(longueur/2), centre.getVectY()+(largeur/2),centre.getVectZ()+(largeur/2));
+    max = Vect(centre.getVectX()+(longueur/2), centre.getVectY()-(largeur/2),centre.getVectZ());
+    color = Color(0.91, 0.54, 0.0, 0.0);
 }
 
-Rectangle::Rectangle(Vect minV, Vect maxV, Color colorValue) {
-    min = minV;
-    max = maxV;
+Rectangle::Rectangle(Vect centre, double longueur, double largeur, Color colorValue) {
+
+    min = Vect(centre.getVectX()-(longueur/2), centre.getVectY()+(largeur/2),centre.getVectZ()+(largeur/2));
+    max = Vect(centre.getVectX()+(longueur/2), centre.getVectY()-(largeur/2),centre.getVectZ());
 
     color = colorValue;
 }

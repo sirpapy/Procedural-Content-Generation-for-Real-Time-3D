@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
     Vect Y(0, 1, 0);
     Vect Z(0, 0, 1);
 
-    Vect cameraPosition(-7, 1.5, -4);
+    Vect cameraPosition(-13, 0, 0);
 
     //le point ou la camera va regarder
     Vect pointToLook(0, 0, 0);
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
 
 
     //Creation de la sphere
-    Plane scene_plane(Y, -1, maroon);
+    Plane scene_plane(Y, -1, white_light);
 
 
     vector<Object *> scene_objects;
@@ -245,8 +245,6 @@ void Parser(vector<Object *> &scene_objects) {
            vector<string> sep = split(line, ':');
            cout << sep.at(0)<<endl;
            if(sep.at(0)=="triangle"){
-
-
                vector<string> vectorOfSphere = split(sep.at(1),',');
                Vect A(stod(vectorOfSphere.at(0)), stod(vectorOfSphere.at(1)), stod(vectorOfSphere.at(2)));
                Vect B(stod(vectorOfSphere.at(3)), stod(vectorOfSphere.at(4)), stod(vectorOfSphere.at(5)));
@@ -256,19 +254,26 @@ void Parser(vector<Object *> &scene_objects) {
                scene_objects.push_back(scene_triangle);
            } else if(sep.at(0)=="rectangle"){
 
-               Rectangle *rectange = new Rectangle();
-               scene_objects.push_back(rectange);
+               vector<string> vectorOfCylinder = split(sep.at(1),',');
+               Vect centre(stod(vectorOfCylinder.at(0)), stod(vectorOfCylinder.at(1)), stod(vectorOfCylinder.at(2)));
+               Rectangle *scene_rectangle = new Rectangle(centre, stod(sep.at(2)), stod(sep.at(3)), purple);
+
+               scene_objects.push_back(scene_rectangle);
 
            }else if(sep.at(0)=="sphere"){
                vector<string> vectorOfSphere = split(sep.at(1),',');
                Vect center(stod(vectorOfSphere.at(0)), stod(vectorOfSphere.at(1)), stod(vectorOfSphere.at(2)));
-               Sphere *scene_sphere = new Sphere(center, 1, pretty_green);
+               Sphere *scene_sphere = new Sphere(center, stod(sep.at(2)), pretty_green);
 
                scene_objects.push_back(scene_sphere);
 
            }else if(sep.at(0) == "cylindre"){
-               Cylinder *cylinder = new Cylinder();
-               scene_objects.push_back(cylinder);
+               vector<string> vectorOfCylinder = split(sep.at(1),',');
+               Vect sommet(stod(vectorOfCylinder.at(0)), stod(vectorOfCylinder.at(1)), stod(vectorOfCylinder.at(2)));
+               Vect base(stod(vectorOfCylinder.at(3)), stod(vectorOfCylinder.at(4)), stod(vectorOfCylinder.at(5)));
+               Cylinder *scene_cylinder = new Cylinder(sommet, base, stod(sep.at(2)), maroon);
+
+               scene_objects.push_back(scene_cylinder);
                //cout << "Un cylindre" ;
            }
        }

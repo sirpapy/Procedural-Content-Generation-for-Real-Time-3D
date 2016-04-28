@@ -1,6 +1,6 @@
-cylindre:1:2:3
-sphere:0,0,0:4
-sphere:4,2,0:4
+cylindre:0,0,0,0,5,0:1
+sphere:0,0,0:1
+sphere:4,2,0:1
 triangle:3,0,0,0,3,0,0,0,3
 triangle:1,2,0,3,2,0,4,0,3
-rectangle:1:2:3
+rectangle:0,0,0:4:3

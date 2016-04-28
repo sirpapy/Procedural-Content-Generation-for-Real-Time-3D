@@ -290,6 +290,7 @@ Cylinder::Cylinder(Vect end1V, Vect end2V, double radV, Color colorValue) {
 
     end1 = end1V;
     end2 = end2V;
+    cout<<"sommet X"<<end2V.getVectX()<<" Y "<<end2V.getVectY()<<" Z "<<end2V.getVectZ()<<endl;
     negend1 = end1.negative();
     negend2 = end2.negative();
     normaxis = end2.vectAdd(negend1).normalize();
