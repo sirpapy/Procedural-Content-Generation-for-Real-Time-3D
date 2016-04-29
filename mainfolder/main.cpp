@@ -36,6 +36,7 @@ using namespace std;
 
 
 void Parser(vector<Object *> &scene_objects);
+void generator(vector<Object *> &scene_objects);
 
 Color black(0.0, 0.0, 0.0, 0);
 Color white_light(1.0, 1.0, 1.0, 0);
@@ -143,7 +144,7 @@ int main(int argc, char *argv[]) {
     Vect Y(0, 1, 0);
     Vect Z(0, 0, 1);
 
-    Vect cameraPosition(-13, 0, 0);
+    Vect cameraPosition(250, 10, 0);
 
     //le point ou la camera va regarder
     Vect pointToLook(0, 0, 0);
@@ -170,13 +171,14 @@ int main(int argc, char *argv[]) {
 
 
     //Creation de la sphere
-    Plane scene_plane(Y, -1, white_light);
+    Plane scene_plane(Y, -1, gray);
 
 
     vector<Object *> scene_objects;
 
 
-     Parser(scene_objects);
+    // Parser(scene_objects);
+    generator(scene_objects);
 
 
      scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
@@ -233,6 +235,30 @@ int main(int argc, char *argv[]) {
 
     savebmp("scene.bmp", width, height, dpi, pixels);
     return 0;
+
+
+}
+void generator(vector<Object *> &scene_objects){
+
+
+    Sphere *scene_sphere;
+    int a=2;
+    int centeri =0;
+    int rotation =0;
+    int rotationX = 5;
+    int centerX =5;
+    int r=a;
+    for(int i = 1; i< 10; i++){
+        Vect center(r, r+centerX, r);
+        scene_sphere  = new Sphere(center, a, pretty_green);
+        scene_objects.push_back(scene_sphere);
+        r=r+a;
+        centeri = (centeri++) % centerX;
+        rotation = (rotation++) % rotationX;
+        cout << (rotation++) % rotationX<<endl;
+        rotationX++;
+        centerX++;
+    }
 
 
 }
