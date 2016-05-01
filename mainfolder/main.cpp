@@ -34,9 +34,8 @@
 using namespace std;
 
 
-
-void Parser(vector<Object *> &scene_objects);
-void generator(vector<Object *> &scene_objects);
+void Parser(vector < Object * > &scene_objects);
+void generator(vector < Object * > &scene_objects);
 
 Color black(0.0, 0.0, 0.0, 0);
 Color white_light(1.0, 1.0, 1.0, 0);
@@ -46,9 +45,8 @@ Color gray(0.5, 0.5, 0.5, 0);
 Color purple(0.6, 0.2, 0.6, 0);
 
 
-
-vector<string> split(string str, char delimiter) {
-    vector<string> internal;
+vector <string> split(string str, char delimiter) {
+    vector <string> internal;
     stringstream ss(str); // Turn the string into a stream.
     string tok;
 
@@ -60,10 +58,7 @@ vector<string> split(string str, char delimiter) {
 }
 
 
-
-
-
-double findMaxValue(vector<double> list){
+double findMaxValue(vector<double> list) {
     double max = 0;
     for (int i = 0; i < list.size(); i++) {
         if (max < list.at(i)) {
@@ -153,7 +148,9 @@ int main(int argc, char *argv[]) {
 
 
     //Là ou la camera va regarder. Difference entre le point ou la camera va regarder et la camera
-    Vect cameradirection = Vect(cameraPosition.getVectX() - pointToLook.getVectX(), cameraPosition.getVectY() - pointToLook.getVectY(), cameraPosition.getVectZ() - pointToLook.getVectZ()).negative().normalize();
+    Vect cameradirection = Vect(cameraPosition.getVectX() - pointToLook.getVectX(),
+                                cameraPosition.getVectY() - pointToLook.getVectY(),
+                                cameraPosition.getVectZ() - pointToLook.getVectZ()).negative().normalize();
 
 
     Vect cameraright = Y.crossProduct(cameradirection).normalize();
@@ -171,17 +168,17 @@ int main(int argc, char *argv[]) {
 
 
     //Creation de la sphere
-    Plane scene_plane(Y, -1, gray);
+    //Plane scene_plane(Y, -1, gray);
 
 
-    vector<Object *> scene_objects;
+    vector < Object * > scene_objects;
 
 
     // Parser(scene_objects);
     generator(scene_objects);
 
 
-     scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
+   // scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
 
     double xamnt, yamnt;
 
@@ -218,7 +215,7 @@ int main(int argc, char *argv[]) {
             int index_of_closest_Object = closestObject(intersections);
             //cout << index_of_closest_Object;
             //return color
-           if (index_of_closest_Object == -1) {
+            if (index_of_closest_Object == -1) {
                 //set the background black
                 pixels[thisone].r = 0;
                 pixels[thisone].g = 0;
@@ -227,7 +224,7 @@ int main(int argc, char *argv[]) {
                 // index corresponds to an object in our scene
                 Color this_color = scene_objects.at(index_of_closest_Object)->getColor();
                 pixels[thisone] = this_color.returnForPixelColor();
-           }
+            }
 
 
         }
@@ -238,76 +235,110 @@ int main(int argc, char *argv[]) {
 
 
 }
-void generator(vector<Object *> &scene_objects){
+int fib(int x) {
+    if (x == 0)
+        return 0;
+
+    if (x == 1)
+        return 1;
+
+    return fib(x-1)+fib(x-2);
+}
+
+void generator(vector < Object * > &scene_objects) {
+
+
+Sphere *scene_sphere;
+int x,y,z=0;
+    double angle;
+    int a=4, b=4;
+    int height=100;
+    for (int i = 2; i < 2000; i++) {
+        angle = 0.1 * i;
+        x = (a + b * angle) * cos(angle);
+        y = (a + b * angle) * sin(angle);
+        z    += i / 10000 * height;
+
+            Vect center(50, x, y);
+            scene_sphere = new Sphere(center, 2, pretty_green);
+            scene_objects.push_back(scene_sphere);
+            //centeri = (centeri++) % centerX;
+
+
+    }
+
+
+}
+void generator2(vector < Object * > &scene_objects) {
 
 
     Sphere *scene_sphere;
-    int a=2;
-    int centeri =0;
-    int rotation =0;
-    int rotationX = 5;
-    int centerX =5;
-    int r=a;
-    for(int i = 1; i< 10; i++){
-        Vect center(r, r+centerX, r);
-        scene_sphere  = new Sphere(center, a, pretty_green);
-        scene_objects.push_back(scene_sphere);
-        r=r+a;
-        centeri = (centeri++) % centerX;
-        rotation = (rotation++) % rotationX;
-        cout << (rotation++) % rotationX<<endl;
-        rotationX++;
-        centerX++;
+int x,y,z=0;
+    double angle;
+    int a=4, b=4;
+    int height=100;
+    for (int i = 2; i < 2000; i++) {
+        angle = 0.1 * i;
+        x = (a + b * angle) * cos(angle);
+        y = (a + b * angle) * sin(angle);
+        z    += i / 10000 * height;
+
+            Vect center(50, x, y);
+            scene_sphere = new Sphere(center, 2, pretty_green);
+            scene_objects.push_back(scene_sphere);
+            //centeri = (centeri++) % centerX;
+
+
     }
 
 
 }
 
-void Parser(vector<Object *> &scene_objects) {
+void Parser(vector < Object * > &scene_objects) {
     string line;
     ifstream myfile("text/figure.txt");
     if (myfile.is_open()) {
-       while (getline(myfile, line)) {
-           vector<string> sep = split(line, ':');
-           cout << sep.at(0)<<endl;
-           if(sep.at(0)=="triangle"){
-               vector<string> vectorOfSphere = split(sep.at(1),',');
-               Vect A(stod(vectorOfSphere.at(0)), stod(vectorOfSphere.at(1)), stod(vectorOfSphere.at(2)));
-               Vect B(stod(vectorOfSphere.at(3)), stod(vectorOfSphere.at(4)), stod(vectorOfSphere.at(5)));
-               Vect C(stod(vectorOfSphere.at(6)), stod(vectorOfSphere.at(7)), stod(vectorOfSphere.at(8)));
-               Triangle *scene_triangle = new Triangle(A,B,C,gray);
+        while (getline(myfile, line)) {
+            vector <string> sep = split(line, ':');
+            cout << sep.at(0) << endl;
+            if (sep.at(0) == "triangle") {
+                vector <string> vectorOfSphere = split(sep.at(1), ',');
+                Vect A(stod(vectorOfSphere.at(0)), stod(vectorOfSphere.at(1)), stod(vectorOfSphere.at(2)));
+                Vect B(stod(vectorOfSphere.at(3)), stod(vectorOfSphere.at(4)), stod(vectorOfSphere.at(5)));
+                Vect C(stod(vectorOfSphere.at(6)), stod(vectorOfSphere.at(7)), stod(vectorOfSphere.at(8)));
+                Triangle *scene_triangle = new Triangle(A, B, C, gray);
 
-               scene_objects.push_back(scene_triangle);
-           } else if(sep.at(0)=="rectangle"){
+                scene_objects.push_back(scene_triangle);
+            } else if (sep.at(0) == "rectangle") {
 
-               vector<string> vectorOfCylinder = split(sep.at(1),',');
-               Vect centre(stod(vectorOfCylinder.at(0)), stod(vectorOfCylinder.at(1)), stod(vectorOfCylinder.at(2)));
-               Rectangle *scene_rectangle = new Rectangle(centre, stod(sep.at(2)), stod(sep.at(3)), purple);
+                vector <string> vectorOfCylinder = split(sep.at(1), ',');
+                Vect centre(stod(vectorOfCylinder.at(0)), stod(vectorOfCylinder.at(1)), stod(vectorOfCylinder.at(2)));
+                Rectangle *scene_rectangle = new Rectangle(centre, stod(sep.at(2)), stod(sep.at(3)), purple);
 
-               scene_objects.push_back(scene_rectangle);
+                scene_objects.push_back(scene_rectangle);
 
-           }else if(sep.at(0)=="sphere"){
-               vector<string> vectorOfSphere = split(sep.at(1),',');
-               Vect center(stod(vectorOfSphere.at(0)), stod(vectorOfSphere.at(1)), stod(vectorOfSphere.at(2)));
-               Sphere *scene_sphere = new Sphere(center, stod(sep.at(2)), pretty_green);
+            } else if (sep.at(0) == "sphere") {
+                vector <string> vectorOfSphere = split(sep.at(1), ',');
+                Vect center(stod(vectorOfSphere.at(0)), stod(vectorOfSphere.at(1)), stod(vectorOfSphere.at(2)));
+                Sphere *scene_sphere = new Sphere(center, stod(sep.at(2)), pretty_green);
 
-               scene_objects.push_back(scene_sphere);
+                scene_objects.push_back(scene_sphere);
 
-           }else if(sep.at(0) == "cylindre"){
-               vector<string> vectorOfCylinder = split(sep.at(1),',');
-               Vect sommet(stod(vectorOfCylinder.at(0)), stod(vectorOfCylinder.at(1)), stod(vectorOfCylinder.at(2)));
-               Vect base(stod(vectorOfCylinder.at(3)), stod(vectorOfCylinder.at(4)), stod(vectorOfCylinder.at(5)));
-               Cylinder *scene_cylinder = new Cylinder(sommet, base, stod(sep.at(2)), maroon);
+            } else if (sep.at(0) == "cylindre") {
+                vector <string> vectorOfCylinder = split(sep.at(1), ',');
+                Vect sommet(stod(vectorOfCylinder.at(0)), stod(vectorOfCylinder.at(1)), stod(vectorOfCylinder.at(2)));
+                Vect base(stod(vectorOfCylinder.at(3)), stod(vectorOfCylinder.at(4)), stod(vectorOfCylinder.at(5)));
+                Cylinder *scene_cylinder = new Cylinder(sommet, base, stod(sep.at(2)), maroon);
 
-               scene_objects.push_back(scene_cylinder);
-               //cout << "Un cylindre" ;
-           }
-       }
-       myfile.close();
-   }
+                scene_objects.push_back(scene_cylinder);
+                //cout << "Un cylindre" ;
+            }
+        }
+        myfile.close();
+    }
 
-   else {
-       cout << "Unable to open file";
+    else {
+        cout << "Unable to open file";
 
-   }
+    }
 }
