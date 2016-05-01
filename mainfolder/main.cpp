@@ -153,8 +153,8 @@ int main(int argc, char *argv[]) {
 
 
     int dpi = 72;
-    int width = 1920;
-    int height = 1080;
+    int width = 640;
+    int height = 480;
     int n = width * height;
     RGBType *pixels = new RGBType[n];
 
@@ -286,6 +286,18 @@ void generator(vector < Object * > &scene_objects) {
     double angle;
     int a=4, b=4;
     int height=100;
+
+
+
+
+
+    Vect sommet(0,-height,0);
+    Vect base(0,height*2,0);
+    Cylinder *scene_cylinder = new Cylinder(base, sommet,2, pickAColor());
+    scene_objects.push_back(scene_cylinder);
+
+
+
     for (int i = 2; i < 200; i++) {
         angle = 0.1 * i;
         x = (a + b * angle) * cos(angle);
@@ -295,7 +307,7 @@ void generator(vector < Object * > &scene_objects) {
         Vect center(50, x, y);
         switch ((int)fRand(1,3)){
             case 1: {
-                scene_sphere = new Sphere(center, fRand(1,6), pickAColor());
+                scene_sphere = new Sphere(center, fRand(1,6), white_light);
                 scene_objects.push_back(scene_sphere);
                 break;
             }
@@ -328,6 +340,8 @@ void generator(vector < Object * > &scene_objects) {
             }
 
         }
+
+
 
         //centeri = (centeri++) % centerX;
 
