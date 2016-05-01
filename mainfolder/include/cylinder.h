@@ -10,13 +10,13 @@
 using namespace std;
 
 class Cylinder : public Object {
-    Vect end1;
-    Vect end2;
+    Vect sommet;
+    Vect base;
     double rad;
     int open;
     Color color;
-    Vect negend1;
-    Vect negend2;
+    Vect inverseSommet;
+    Vect inverseBase;
     Vect normaxis;
     Vect negnormaxis;
 
@@ -219,7 +219,7 @@ public:
 
 
     double findIntersection(Ray ray) {
-        Vect raystartminusthisend1 = negend1.vectAdd(ray.getRayOrigin());
+        Vect raystartminusthisend1 = inverseSommet.vectAdd(ray.getRayOrigin());
         double a, b, c, t, nearestpointonaxis, discriminant;
         Vect u, v, pos;
 
@@ -241,8 +241,8 @@ public:
                 pos = ray.getRayOrigin().vectAdd(ray.getRayDirection().vectMult(t));
 
 
-                if ((normaxis.dotProduct(pos.vectAdd(negend1)) > 0) &&
-                    (negnormaxis.dotProduct(pos.vectAdd(negend2)) > 0))
+                if ((normaxis.dotProduct(pos.vectAdd(inverseSommet)) > 0) &&
+                    (negnormaxis.dotProduct(pos.vectAdd(inverseBase)) > 0))
                     return t;
             }
             else if (discriminant > 0) {
@@ -253,14 +253,14 @@ public:
                 pos = ray.getRayOrigin().vectAdd(ray.getRayDirection().vectMult(t));
 
 
-                if ((normaxis.dotProduct(pos.vectAdd(negend1)) > 0) &&
-                    (negnormaxis.dotProduct(pos.vectAdd(negend2)) > 0))
+                if ((normaxis.dotProduct(pos.vectAdd(inverseSommet)) > 0) &&
+                    (negnormaxis.dotProduct(pos.vectAdd(inverseBase)) > 0))
                     return t;
                 /*if (isects.length < 2) {
                     t = (sqrtdiscriminant - b) * oneovertwoa;
                     pos = Vector.add(ray.start, Vector.scalar(ray.dir, t));
-                    if ((Vector.dot(this.normaxis, Vector.add(pos, this.negend1)) > 0) &&
-                        (Vector.dot(this.negnormaxis, Vector.add(pos, this.negend2)) > 0))
+                    if ((Vector.dot(this.normaxis, Vector.add(pos, this.inverseSommet)) > 0) &&
+                        (Vector.dot(this.negnormaxis, Vector.add(pos, this.inverseBase)) > 0))
                         return t;
                 }*/
             }
@@ -275,25 +275,25 @@ public:
 
 Cylinder::Cylinder() {
 
-    end1 = Vect(0, 0, 0);
-    end2 = Vect(4, 3, 1);
-    negend1 = end1.negative();
-    negend2 = end2.negative();
-    normaxis = end2.vectAdd(negend1).normalize();
+    sommet = Vect(0, 0, 0);
+    base = Vect(4, 3, 1);
+    inverseSommet = sommet.negative();
+    inverseBase = base.negative();
+    normaxis = base.vectAdd(inverseSommet).normalize();
     negnormaxis = normaxis.negative();
     rad = 1;
     open = 1;
     color = Color(0.7, 0.8, 0.4, 0.0);
 }
 
-Cylinder::Cylinder(Vect end1V, Vect end2V, double radV, Color colorValue) {
+Cylinder::Cylinder(Vect sommetV, Vect baseV, double radV, Color colorValue) {
 
-    end1 = end1V;
-    end2 = end2V;
-    cout<<"sommet X"<<end2V.getVectX()<<" Y "<<end2V.getVectY()<<" Z "<<end2V.getVectZ()<<endl;
-    negend1 = end1.negative();
-    negend2 = end2.negative();
-    normaxis = end2.vectAdd(negend1).normalize();
+    sommet = sommetV;
+    base = baseV;
+    cout<<"sommet X"<<baseV.getVectX()<<" Y "<<baseV.getVectY()<<" Z "<<baseV.getVectZ()<<endl;
+    inverseSommet = sommet.negative();
+    inverseBase = base.negative();
+    normaxis = base.vectAdd(inverseSommet).normalize();
     negnormaxis = normaxis.negative();
     rad = radV;
     open = 1;
