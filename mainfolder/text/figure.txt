@@ -1,7 +1,2 @@
-cylindre:0,0,0,0,20,0:1
-cylindre:10,0,5,10,20,5:1
-sphere:0,0,0:1
-sphere:4,2,0:1
-triangle:3,0,0,0,3,0,0,0,3
+triangle:-1,1,0,1,-1,0,0,1,0
 triangle:1,2,0,3,2,0,4,0,3
-rectangle:0,0,0:4:3

@@ -13,6 +13,6 @@ set(SOURCE_FILES
     include/ray.h
     include/sphere.h
     include/vect.h
-    main.cpp)
+    main.cpp include/Noeud.cpp include/Noeud.h)
 
 add_executable(mainfolder ${SOURCE_FILES})

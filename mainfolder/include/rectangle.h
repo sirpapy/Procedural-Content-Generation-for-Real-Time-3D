@@ -11,7 +11,9 @@ using namespace std;
 
 class Rectangle : public Object {
     Vect min, max;
+    double longueur, largeur;
     Color color;
+    Vect centre;
 
 
 public:
@@ -19,6 +21,7 @@ public:
     Rectangle();
 
     Rectangle(Vect, double, double, Color);
+
     Color getColor() { return color; }
 
     double findIntersection(Ray ray) {
@@ -59,23 +62,52 @@ public:
     }
 
 
+  virtual  Sphere getSBBOX() {
+        double radius = sqrt(pow(longueur / 2, 2) + pow(largeur / 2, 2));
+
+        Color color = Color(0.91, 0.54, 0.0, 0.0);
+
+        return Sphere(centre, radius, color);
+    }
+
+
+    double getVolume() {
+        double radius = sqrt(pow(longueur / 2, 2) + pow(largeur / 2, 2));
+
+        Color color = Color(0.91, 0.54, 0.0, 0.0);
+
+        return Sphere(centre, radius, color).getVolume();
+    }
+
+    Vect getSBBoxCenter() {
+        return centre;
+    };
+    char *getName() {
+        return "rectangle";
+    };
+
+
 };
 
 Rectangle::Rectangle() {
-    double longueur = 3;
-    double largeur = 3;
-    Vect centre = Vect(0,0,5);
+    longueur = 3;
+    largeur = 3;
+    centre = Vect(0, 0, 5);
 
 
-    min = Vect(centre.getVectX()-(longueur/2), centre.getVectY()+(largeur/2),centre.getVectZ()+(largeur/2));
-    max = Vect(centre.getVectX()+(longueur/2), centre.getVectY()-(largeur/2),centre.getVectZ());
+    min = Vect(centre.getVectX() - (longueur / 2), centre.getVectY() + (largeur / 2),
+               centre.getVectZ() + (largeur / 2));
+    max = Vect(centre.getVectX() + (longueur / 2), centre.getVectY() - (largeur / 2), centre.getVectZ());
     color = Color(0.91, 0.54, 0.0, 0.0);
 }
 
-Rectangle::Rectangle(Vect centre, double longueur, double largeur, Color colorValue) {
-
-    min = Vect(centre.getVectX()-(longueur/2), centre.getVectY()+(largeur/2),centre.getVectZ()+(largeur/2));
-    max = Vect(centre.getVectX()+(longueur/2), centre.getVectY()-(largeur/2),centre.getVectZ());
+Rectangle::Rectangle(Vect ce, double lo, double la, Color colorValue) {
+    centre = ce;
+    longueur = lo;
+    largeur = la;
+    min = Vect(centre.getVectX() - (longueur / 2), centre.getVectY() + (largeur / 2),
+               centre.getVectZ() + (largeur / 2));
+    max = Vect(centre.getVectX() + (longueur / 2), centre.getVectY() - (largeur / 2), centre.getVectZ());
 
     color = colorValue;
 }

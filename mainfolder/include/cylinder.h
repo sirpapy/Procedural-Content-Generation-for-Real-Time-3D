@@ -216,7 +216,31 @@ public:
 //            return -1;
 //        }
 //    }
+    char* getName(){
+        return "Cylinder";
+    };
 
+   virtual Sphere getSBBOX(){
+        double A = 2 * M_PI*rad*abs(sommet.getVectY()-base.getVectY());
+
+        double radius = sqrt(pow(rad,2)+(pow(A,2)/(16*M_PI*M_PI*rad*rad)));
+        Color color = Color(0.91, 0.54, 0.0, 0.0);
+        return Sphere(Vect(sommet.getVectX(),sommet.getVectY()-base.getVectY(), sommet.getVectZ()), radius,color);
+    }
+
+
+    double getVolume(){
+        double A = 2 * M_PI*rad*abs(sommet.getVectY()-base.getVectY());
+
+        double radius = sqrt(pow(rad,2)+(pow(A,2)/(16*M_PI*M_PI*rad*rad)));
+        Color color = Color(0.91, 0.54, 0.0, 0.0);
+        return Sphere(Vect(sommet.getVectX(),sommet.getVectY()-base.getVectY(), sommet.getVectZ()), radius,color).getVolume();
+    }
+
+    Vect getSBBoxCenter() {
+
+        return Vect(sommet.getVectX(),sommet.getVectY()-base.getVectY(), sommet.getVectZ());
+    };
 
     double findIntersection(Ray ray) {
         Vect raystartminusthisend1 = inverseSommet.vectAdd(ray.getRayOrigin());
