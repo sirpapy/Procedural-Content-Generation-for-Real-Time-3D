@@ -38,7 +38,7 @@ void Parser(vector<Object *> &scene_objects);
 
 void generator(vector<Object *> &scene_objects);
 
-void constructor(vector<Object *> &scene_objects);
+vector<Object *> constructor(vector<Object *> &scene_objects);
 
 
 Color black(0.0, 0.0, 0.0, 0);
@@ -154,41 +154,66 @@ int closestObject(vector<double> object_intersections) {
 
 int thisone;
 
+#define FLT_MAX 3.40282347E+38F
 
-//// Compute indices to the two most separated points of the (up to) six points
-//// defining the SBBOX encompassing the point set. Return these as min and max.
-//void PointsLesPlusSepares(int &min, int &max, vector<Object *> objects,
-//                          int numPts) { // First find most extreme points along principal axes
-//    int minX = 0, maxX = 0, minY = 0, maxY = 0, minZ = 0, maxZ = 0;
-//    for (int i = 1; i < numPts; i++) {
-//
-//        if (objects.at(i)->getSBBoxCenter().getVectX() < objects.at(minX)->getSBBoxCenter().getVectX()) { minX = i; }
-//        if (objects.at(i)->getSBBoxCenter().getVectX() > objects.at(maxX)->getSBBoxCenter().getVectX()) { minX = i; }
-//        if (objects.at(i)->getSBBoxCenter().getVectY() < objects.at(minY)->getSBBoxCenter().getVectY()) { minY = i; }
-//        if (objects.at(i)->getSBBoxCenter().getVectY() > objects.at(maxY)->getSBBoxCenter().getVectY()) { maxY = i; }
-//        if (objects.at(i)->getSBBoxCenter().getVectZ() < objects.at(minZ)->getSBBoxCenter().getVectZ()) { minZ = i; }
-//        if (objects.at(i)->getSBBoxCenter().getVectZ() > objects.at(maxZ)->getSBBoxCenter().getVectZ()) { maxZ = i; }
-//
-//
-//       // cout <<" Nom : "<<objects.at(i)->getName()<<" MaxXXXXXXX = "<<objects.at(i)->getVolume()<<" Centre : "<<objects.at(i)->getCenter().getVectX()<<endl;
-//    }
-//    // Compute the squared distances for the three pairs of points
-//    float dist2x = objects.at(maxX)->getSBBoxCenter().vectAdd(objects.at(minX)->getSBBoxCenter().negative()).dotProduct(objects.at(maxX)->getSBBoxCenter().vectAdd(objects.at(minX)->getSBBoxCenter().negative()));
-//    float dist2y = objects.at(maxY)->getSBBoxCenter().vectAdd(objects.at(minY)->getSBBoxCenter().negative()).dotProduct(objects.at(maxY)->getSBBoxCenter().vectAdd(objects.at(minY)->getSBBoxCenter().negative()));
-//    float dist2z = objects.at(maxZ)->getSBBoxCenter().vectAdd(objects.at(minZ)->getSBBoxCenter().negative()).dotProduct(objects.at(maxZ)->getSBBoxCenter().vectAdd(objects.at(minZ)->getSBBoxCenter().negative()));
-//
-//    cout <<"les points les plus eloignées sont : min "<<dist2z<< " et max "<< dist2x<<endl;
-//
-//    if (dist2z > dist2x && dist2z > dist2y) {
-//        max = maxZ;
-//        min = minZ;
-//    }
-//    if(dist2z > dist2x && dist2z >dist2y){
-//        max = maxZ;
-//        min = minZ;
-//    }
-//    cout <<" Nom : "<<min<<" MaxXXXXXXX = "<<max<<endl;
-//}
+//Returns indices imin and imax into pt[] array of the least and
+//most, respectively, distant points along the direction dir
+
+void pointLePlusEloigneSelonDirection(Vect dir, vector<Object *> objects, int n, int *imin, int *imax){
+    float minproj = FLT_MAX, maxproj = -FLT_MAX;
+    for(int i = 0; i<n;i++){
+        float proj = objects.at(i)->getSBBoxCenter().dotProduct(dir);
+        if(proj<minproj){
+            minproj = proj;
+            *imin = i;
+        }
+        //keep track of most distant point along direction vector
+        if(proj>maxproj){
+            maxproj = proj;
+            *imax = i;
+        }
+    }
+
+}
+
+
+
+
+
+// Compute indices to the two most separated points of the (up to) six points
+// defining the SBBOX encompassing the point set. Return these as min and max.
+void PointsLesPlusSepares(int &min, int &max, vector<Object *> objects,
+                          int numPts) { // First find most extreme points along principal axes
+    int minX = 0, maxX = 0, minY = 0, maxY = 0, minZ = 0, maxZ = 0;
+    for (int i = 1; i < numPts; i++) {
+
+        if (objects.at(i)->getSBBoxCenter().getVectX() < objects.at(minX)->getSBBoxCenter().getVectX()) { minX = i; }
+        if (objects.at(i)->getSBBoxCenter().getVectX() > objects.at(maxX)->getSBBoxCenter().getVectX()) { maxX = i; }
+        if (objects.at(i)->getSBBoxCenter().getVectY() < objects.at(minY)->getSBBoxCenter().getVectY()) { minY = i; }
+        if (objects.at(i)->getSBBoxCenter().getVectY() > objects.at(maxY)->getSBBoxCenter().getVectY()) { maxY = i; }
+        if (objects.at(i)->getSBBoxCenter().getVectZ() < objects.at(minZ)->getSBBoxCenter().getVectZ()) { minZ = i; }
+        if (objects.at(i)->getSBBoxCenter().getVectZ() > objects.at(maxZ)->getSBBoxCenter().getVectZ()) { maxZ = i; }
+
+
+       // cout <<" Nom : "<<objects.at(i)->getName()<<" MaxXXXXXXX = "<<objects.at(i)->getVolume()<<" Centre : "<<objects.at(i)->getCenter().getVectX()<<endl;
+    }
+    // Compute the squared distances for the three pairs of points
+    float dist2x = objects.at(maxX)->getSBBoxCenter().vectAdd(objects.at(minX)->getSBBoxCenter().negative()).dotProduct(objects.at(maxX)->getSBBoxCenter().vectAdd(objects.at(minX)->getSBBoxCenter().negative()));
+    float dist2y = objects.at(maxY)->getSBBoxCenter().vectAdd(objects.at(minY)->getSBBoxCenter().negative()).dotProduct(objects.at(maxY)->getSBBoxCenter().vectAdd(objects.at(minY)->getSBBoxCenter().negative()));
+    float dist2z = objects.at(maxZ)->getSBBoxCenter().vectAdd(objects.at(minZ)->getSBBoxCenter().negative()).dotProduct(objects.at(maxZ)->getSBBoxCenter().vectAdd(objects.at(minZ)->getSBBoxCenter().negative()));
+
+    min = minX;
+    max = maxX;
+    if (dist2y > dist2x && dist2y > dist2z) {
+        max = maxY;
+        min = minY;
+    }
+    if(dist2z > dist2x && dist2z >dist2y){
+        max = maxZ;
+        min = minZ;
+    }
+    cout <<"les points les plus eloignées sont : min "<<min<< " et max "<< max<<endl;
+}
 
 int main(int argc, char *argv[]) {
 
@@ -248,22 +273,21 @@ int main(int argc, char *argv[]) {
     //Parser(scene_objects);
 
     generator(scene_objects);
-    constructor(scene_objects);
+    scene_objects = constructor(scene_objects);
     int min=-1,max=-1;
-    //PointsLesPlusSepares(min, max, scene_objects, scene_objects.size());
+    PointsLesPlusSepares(min, max, scene_objects, scene_objects.size());
 
 
     // scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
 
 
-/*
+
     double xamnt, yamnt;
 
 
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
             thisone = y * width + x;
-
             if (width > height) {
                 xamnt = ((x + 0.5) / width) * aspectratio - (((width - height) / (double) height) / 2);
                 yamnt = ((height - y) + 0.5) / height;
@@ -277,8 +301,7 @@ int main(int argc, char *argv[]) {
             }
             //l'origine de nos rayons sera l'origine de notre camera
             Vect cam_ray_origin = scene_cam.getCameraPostion();
-            Vect cam_ray_direction = cameradirection.vectAdd(
-                    cameraright.vectMult(xamnt - 0.5).vectAdd(cameradown.vectMult(yamnt - 0.5))).normalize();
+            Vect cam_ray_direction = cameradirection.vectAdd(cameraright.vectMult(xamnt - 0.5).vectAdd(cameradown.vectMult(yamnt - 0.5))).normalize();
             Ray cam_ray(cam_ray_origin, cam_ray_direction);
             vector<double> intersections;
 
@@ -307,7 +330,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    savebmp("scene.bmp", width, height, dpi, pixels);*/
+    savebmp("scene.bmp", width, height, dpi, pixels);
     return 0;
 
 
@@ -412,11 +435,19 @@ void generator(vector<Object *> &scene_objects) {
     }
 }*/
 
-void constructor(vector<Object *> &S) {
+vector<Object *> constructor(vector<Object *> &S) {
     vector<Object *> P = S;
     Object *tmp;
     Vect origin = Vect(0, 0, 0);
     //std::sort(P.begin(), P.end());
+
+
+    for (int i = 0; i < P.size(); i++) {
+        cout << "i: "<<i<<" Nom: "<<P.at(i)->getName() <<" Center X : " <<  P.at(i)->getSBBoxCenter().getVectX()<< " Y : " <<  P.at(i)->getSBBoxCenter().getVectY()<< " Z : " <<  P.at(i)->getSBBoxCenter().getVectZ() << endl;
+        //cout <<"....."<<P.atj(i)->getName()<<"-----"<< P.at(i)->getSBBoxCenter().getVectZ();
+    }
+
+
 
     for (int i = 0; i < P.size(); i++) {
         for (int j = 0; j < P.size(); j++) {
@@ -430,10 +461,12 @@ void constructor(vector<Object *> &S) {
     cout << "FIN TRIE"<<endl;
 
     for (int i = 0; i < P.size(); i++) {
-        //cout << "Center X : " <<  P.at(i)->getCenter().getVectX()<< " Y : " <<  P.at(i)->getCenter().getVectY()<< " Z : " <<  P.at(i)->getCenter().getVectZ() << endl;
-        //cout <<"....."<<P.at(i)->getName()<<"-----"<< P.at(i)->getSBBoxCenter().getVectZ();
+        cout << "i: "<<i<<" Nom: "<<P.at(i)->getName() <<" Center X : " <<  P.at(i)->getSBBoxCenter().getVectX()<< " Y : " <<  P.at(i)->getSBBoxCenter().getVectY()<< " Z : " <<  P.at(i)->getSBBoxCenter().getVectZ() << endl;
+        //cout <<"....."<<P.atj(i)->getName()<<"-----"<< P.at(i)->getSBBoxCenter().getVectZ();
         }
     cout <<endl;
+
+    return P;
     }
 
 
@@ -515,10 +548,5 @@ void Parser(vector<Object *> &scene_objects) {
     }
 }
 
-
-struct SBBOX {
-    float rayon_sphere;
-    Vect centre;
-};
 
 

@@ -11,6 +11,8 @@ public:
 
     Vect(double,double,double);
 
+    static Vect Min(const Vect &left, const Vect &right);
+    static Vect Max(const Vect &left, const Vect &right);
     //method functions
 
     double getVectX(){
@@ -65,6 +67,21 @@ public:
         if (b.getVectY() < y) return false;
         return z < b.getVectZ();
     }
+
+    Vect Vect::Min(const Vect &left, const Vect &right) {
+        Vect p;
+        p.x = left.x > right.x ? right.x : left.x;
+        p.y = left.y > right.y ? right.y : left.y;
+        p.z = left.z > right.z ? right.z : left.z;
+        return p;
+    }
+
+    Vect Vect::Max(const Vect &left, const Vect &right) {
+        Vect p;
+        p.x = left.x < right.x ? right.x : left.x;
+        p.y = left.y < right.y ? right.y : left.y;
+        p.z = left.z < right.z ? right.z : left.z;
+        return p;
 
 };
 

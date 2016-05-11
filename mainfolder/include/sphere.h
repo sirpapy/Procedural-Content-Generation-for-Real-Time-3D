@@ -84,16 +84,12 @@ public:
             /// The ray intersects the sphere
             //Si le rayon intersect avec la sphere il peut le faire sur les deux faces. on doit récuperer la premiere face
             //first root(face)
-            double root_1 = ((-1 * b - sqrt(discriminant)) / 2) - 0.0000001; //0.000001 arbritraire
+            double root_1 = ((-1 * b - sqrt(discriminant)) / 2); //0.000001 arbritraire
             if (root_1 > 0) {
                 //The first root is the smallest positive root
                 return root_1;
             }
-            else {
-                //the second root is the smallest positive root
-                double root_2 = ((sqrt(discriminant) - b) / 2) - 0.0000001;
-                return root_2;
-            }
+
         } else {
             //the ray miss the sphere
             return -1;
