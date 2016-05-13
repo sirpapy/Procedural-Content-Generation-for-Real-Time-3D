@@ -60,14 +60,6 @@ Color crimson(0.862745, 0.0784314, 0.235294, 0);
 Color seagreen(0.180392, 0.545098, 0.341176, 0.3);
 
 
-
-
-
-
-
-
-
-
 int dpi = 72;
 int width = 646;
 int height = 480;
@@ -91,11 +83,6 @@ Vect cameraPosition(250, 10, -5);
 
 //le point ou la camera va regarder
 Vect pointToLook(0, 0, 0);
-
-
-
-
-
 
 
 double fRand(double fMin, double fMax) {
@@ -699,16 +686,6 @@ static void Exit(void) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
 static void Dessin(void) {
 
     //Vect diff_btw(cameraPosition.getVectX() - pointToLook.getVectX(), cameraPosition.getVectY() - pointToLook.getVectY(), cameraPosition.getVectZ() - pointToLook.getVectZ());
@@ -823,12 +800,15 @@ static void Dessin(void) {
 //        fwrite(color, 1, 3, f);
 //    }
 
-    char rgb[width*height*3];
+    float rgb[width][height][3];
 
-    for (int i = 0; i< width*height;i+=3){
-        rgb[i] = (pixels[i].r) * 255;
-        rgb[i+1] = (pixels[i].g) * 255;
-        rgb[i+2] = (pixels[i].b) * 255;
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            thisone = y * height + x;
+            rgb[y][x][0] = (pixels[thisone].r);
+            rgb[y][x][1] = (pixels[thisone].g);
+            rgb[y][x][2] = (pixels[thisone].b);
+        }
     }
 
 
@@ -848,16 +828,23 @@ static void Dessin(void) {
 
 
 //    cout<<"salut"<<buffer<<endl;
-    glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, rgb);
+    glDrawPixels(width, height, GL_RGB, GL_FLOAT, rgb);
 }
 
 
 
+void niveau1(){
+
+}
+
+
+void niveau2(){
+
+}
 
 
 
-int main(int argc, char *argv[]) {
-
+void niveau3(){
     cout << "rendering ..." << endl;
 
     /* initialisation de la fenêtre graphique et paramétrage Gl */
@@ -899,6 +886,14 @@ int main(int argc, char *argv[]) {
 
 
     return g3x_MainStart();
+
+}
+
+int main(int argc, char *argv[]) {
+
+    niveau1();
+    niveau2();
+    niveau3();
 
 
 }
