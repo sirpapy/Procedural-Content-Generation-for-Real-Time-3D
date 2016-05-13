@@ -14,9 +14,9 @@ endif
 DBG = no
 
 ifeq ($(DBG),yes) #en mode debug
-  CFLAGS = -g
+  CFLAGS = -g -W
 else               #en mode normal
-  CFLAGS =
+  CFLAGS = -w
 endif
 
 # assemblage des infos de lib. et inc.

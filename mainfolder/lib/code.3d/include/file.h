@@ -1,6 +1,7 @@
 #ifndef _BMP_H
 #define _BMP_H
 
+#include "color.h"
 
 void savebmp(const char *filename, int w, int h, int dpi, RGBType *data) {
     FILE *f;

@@ -663,34 +663,6 @@ static void Exit(void) {
 
 static void Dessin(void) {
 
-    int dpi = 72;
-    int width = 640;
-    int height = 480;
-    int n = width * height;
-    RGBType *pixels = new RGBType[n];
-    double ambientlight = 0.35;
-
-    //Pour des erreurs de calculs on doit empecher que l'intersection ait lieu a linterieur d'un object
-    //Cette variable permet d'être sur que cela soit a la surface en ajoutant un epsilon
-    double accuracy = 0.000001;
-
-    double aspectratio = (double) width / (double) height;
-
-
-    Vect OVect(0, 0, 0);
-    Vect XVect(1, 0, 0);
-    Vect YVect(0, 1, 0);
-    Vect ZVect(0, 0, 1);
-
-    Vect cameraPosition(250, 10, -5);
-
-    //le point ou la camera va regarder
-    Vect pointToLook(0, 0, 0);
-    //Vect diff_btw(cameraPosition.getVectX() - pointToLook.getVectX(), cameraPosition.getVectY() - pointToLook.getVectY(), cameraPosition.getVectZ() - pointToLook.getVectZ());
-
-
-
-
     //Vect diff_btw(cameraPosition.getVectX() - pointToLook.getVectX(), cameraPosition.getVectY() - pointToLook.getVectY(), cameraPosition.getVectZ() - pointToLook.getVectZ());
 
 
@@ -835,55 +807,23 @@ static void Dessin(void) {
 }
 
 
-void niveau1() {
+
+void niveau1(){
 
 }
 
 
-int niveau2() {
+void niveau2(){
 
-    return 0;
 }
 
 
-int niveau3() {
+
+void niveau3(){
     cout << "rendering ..." << endl;
 
-
-
-    Vect OVect(0, 0, 0);
-    Vect XVect(1, 0, 0);
-    Vect YVect(0, 1, 0);
-    Vect ZVect(0, 0, 1);
-    Vect cameraPosition(250, 10, -5);
-
-    //le point ou la camera va regarder
-    Vect pointToLook(0, 0, 0);
-    //Vect diff_btw(cameraPosition.getVectX() - pointToLook.getVectX(), cameraPosition.getVectY() - pointToLook.getVectY(), cameraPosition.getVectZ() - pointToLook.getVectZ());
-
-
-
-    //Là ou la camera va regarder. Difference entre le point ou la camera va regarder et la camera
-    Vect cameradirection = Vect(cameraPosition.getVectX() - pointToLook.getVectX(),
-                                cameraPosition.getVectY() - pointToLook.getVectY(),
-                                cameraPosition.getVectZ() - pointToLook.getVectZ()).negative().normalize();
-
-
-    Vect cameraright = YVect.crossProduct(cameradirection).normalize();
-    Vect cameradown = cameraright.crossProduct(cameradirection).normalize();
-    Camera scene_cam(cameraPosition, cameradirection, cameraright, cameradown);
-
-
-    int dpi = 72;
-    int width = 640;
-    int height = 480;
-    int n = width * height;
-    RGBType *pixels = new RGBType[n];
-    double ambientlight = 0.35;
-
-
     /* initialisation de la fenêtre graphique et paramétrage Gl */
-    g3x_InitWindow("Lray", width, height);
+    g3x_InitWindow(*argv, width, height);
 
     g3x_SetScrollWidth(6);
     g3x_CreateScrollv_d("ray", &ambientlight, 0.1, 1.0, 1.0, "Deplacement lateral camera");
@@ -943,10 +883,10 @@ int main(int argc, char *argv[]) {
     double aspectratio = (double) width / (double) height;
 
 
-    Vect OVect(0, 0, 0);
-    Vect XVect(1, 0, 0);
-    Vect YVect(0, 1, 0);
-    Vect ZVect(0, 0, 1);
+    Vect O(0, 0, 0);
+    Vect X(1, 0, 0);
+    Vect Y(0, 1, 0);
+    Vect Z(0, 0, 1);
 
     Vect cameraPosition(250, 10, -5);
 
@@ -962,7 +902,7 @@ int main(int argc, char *argv[]) {
                                 cameraPosition.getVectZ() - pointToLook.getVectZ()).negative().normalize();
 
 
-    Vect cameraright = YVect.crossProduct(cameradirection).normalize();
+    Vect cameraright = Y.crossProduct(cameradirection).normalize();
     Vect cameradown = cameraright.crossProduct(cameradirection).normalize();
     Camera scene_cam(cameraPosition, cameradirection, cameraright, cameradown);
 
@@ -975,13 +915,13 @@ int main(int argc, char *argv[]) {
 
     //Tableau pour avoir plusieurs sources de lumière
     vector<Source *> light_sources;
-    light_sources.push_back(dynamic_cast<Source *>(&scene_light));
+    light_sources.push_back(dynamic_cast<Source*>(&scene_light));
 
 
 
 
     //Creation de la sphere
-    Plane scene_plane(YVect, -1, gray);
+    Plane scene_plane(Y, -1, gray);
 
 
     vector<Object *> scene_objects;
@@ -995,6 +935,7 @@ int main(int argc, char *argv[]) {
 
 
     scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
+
 
 
     double xamnt, yamnt;
@@ -1016,8 +957,7 @@ int main(int argc, char *argv[]) {
             }
             //l'origine de nos rayons sera l'origine de notre camera
             Vect cam_ray_origin = scene_cam.getCameraPostion();
-            Vect cam_ray_direction = cameradirection.vectAdd(
-                    cameraright.vectMult(xamnt - 0.5).vectAdd(cameradown.vectMult(yamnt - 0.5))).normalize();
+            Vect cam_ray_direction = cameradirection.vectAdd(cameraright.vectMult(xamnt - 0.5).vectAdd(cameradown.vectMult(yamnt - 0.5))).normalize();
             Ray cam_ray(cam_ray_origin, cam_ray_direction);
             vector<double> intersections;
 
@@ -1038,16 +978,13 @@ int main(int argc, char *argv[]) {
                 pixels[thisone].b = 0;
             } else {
                 // index corresponds to an object in our scene
-                if (intersections.at(index_of_closest_Object) > accuracy) {
+                if(intersections.at(index_of_closest_Object)> accuracy ){
 
                     //Determine the position and direction vectors at the point of intersection
-                    Vect intersection_position = cam_ray_origin.vectAdd(
-                            cam_ray_direction.vectMult(intersections.at(index_of_closest_Object)));
+                    Vect intersection_position = cam_ray_origin.vectAdd(cam_ray_direction.vectMult(intersections.at(index_of_closest_Object)));
                     Vect intersecting_ray_direction = cam_ray_direction;
 
-                    Color intersection_color = getColorAt(intersection_position, intersecting_ray_direction,
-                                                          scene_objects, index_of_closest_Object, accuracy,
-                                                          light_sources, ambientlight);
+                    Color intersection_color = getColorAt(intersection_position, intersecting_ray_direction, scene_objects, index_of_closest_Object, accuracy, light_sources, ambientlight);
                     pixels[thisone] = intersection_color.returnForPixelColor();
                 }
             }
