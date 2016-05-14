@@ -777,8 +777,8 @@ int niveau1() {
  * @description: Fonction de dessin du niveau 2;
 **/
 int niveau2(int ps) {
-    Parser(inputFile, scene_objects, cameraPosition)
-    cout << "CAMERA POSITION " << cameraPosition.getVectX() << "--" << cameraPosition.getVectY() << "--" <<
+    Parser(inputFile, scene_objects, cameraPosition);
+    cout << "CAMERA POSITION " << cameraPosition.getVectX() << "--" << cameraPosition.getVectY() << "--" <<endl;
 
     Vect light_position;
     Light scene_light;

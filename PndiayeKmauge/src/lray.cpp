@@ -33,10 +33,7 @@
 #include "../include/fonctionsAnnexe.h"
 
 
-
-
 using namespace std;
-
 
 
 char *inputFile = "text/figure.txt";
@@ -49,6 +46,10 @@ int width = 640;
 int height = 480;
 int n = width * height;
 
+int NIVEAU_1_FLAG = 0;
+int NIVEAU_2_FLAG = 0;
+int NIVEAU_3_FLAG = 0;
+
 
 /*Va representer notre tableau de de données RGB de notre image finale*/
 RGBType *pixels = new RGBType[n];
@@ -56,7 +57,6 @@ RGBType *pixels = new RGBType[n];
 
 /*Variable correspondant à la luminosité générale de la scene*/
 double ambientlight = 0.35;
-
 
 
 //Pour des erreurs de calculs on doit empecher que l'intersection ait lieu a linterieur d'un object
@@ -68,9 +68,6 @@ double accuracy = 0.000001;
 double aspectratio = (double) width / (double) height;
 
 
-
-
-
 /*Permet de definir notre plan*/
 Vect OVect(0, 0, 0);
 Vect XVect(1, 0, 0);
@@ -78,17 +75,12 @@ Vect YVect(0, 1, 0);
 Vect ZVect(0, 0, 1);
 
 
-
 /*Position initiale de la camera*/
-Vect cameraPosition(250, 90, -5);
-
+Vect cameraPosition(240, 40, -5);
 
 
 //le point ou la camera va regarder
 Vect pointToLook(0, 0, 0);
-
-
-
 
 
 //Là ou la camera va regarder. Difference entre le point ou la camera va regarder et la camera
@@ -109,14 +101,6 @@ vector<Object *> scene_objects;
 
 //Tableau pour avoir plusieurs sources de lumière
 vector<Source *> light_sources;
-
-
-
-
-
-
-
-
 
 
 /**
@@ -236,8 +220,6 @@ Color getColorAt(Vect intersection_position, Vect intersecting_ray_direction, ve
     Color final_color(closestObjectColor.colorScalar(ambientlight));
 
 
-
-
     for (int lindex = 0; lindex < light_sources.size(); lindex++) {
 
         Vect light_direction = light_sources.at(lindex)->getLightPosition().vectAdd(
@@ -279,7 +261,7 @@ Color getColorAt(Vect intersection_position, Vect intersecting_ray_direction, ve
                         closestObjectColor.colorMult(light_sources.at(lindex)->getColor().colorScalar(cosinus_angle)));
 
                 if (closestObjectColor.getColorSpecial() > 0 && closestObjectColor.getColorSpecial() <= 1) {
-                    //Special 0 to 1 will reflect the shiningness
+                    //Quand la valeur special de la couleur vaudra 0 à 1 cela va réfleter de la lumiere
                     double dot1 = closestObjectNormal.dotProduct(intersecting_ray_direction.negative());
                     Vect scalar1 = closestObjectNormal.vectMult(dot1);
                     Vect add1 = scalar1.vectAdd(intersecting_ray_direction);
@@ -425,16 +407,6 @@ void generatorSpyral(vector<Object *> &scene_objects) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
 /**
  * @method: trie
  * @description: permet de trier une liste d'object entré en paramétre par rapport à l'origine
@@ -462,22 +434,32 @@ vector<Object *> trie(vector<Object *> &S) {
 }
 
 
-
-
-
 /**
  * @method: Parser
  * @description: Permet de parser un fichier pris en paramétre
  * @param  fichier d'entree à parser et une liste d'objects
  * @return nouvelle liste avec les objects parsés
 **/
-void Parser(char *inputFile, vector<Object *> &scene_objects) {
+
+void Parser(char *inputFile, vector<Object *> &scene_objects, Vect &cameraPosition) {
     string line;
     ifstream myfile(inputFile);
     if (myfile.is_open()) {
         while (getline(myfile, line)) {
             vector<string> sep = split(line, ':');
-            cout << sep.at(0) << endl;
+            if (NIVEAU_1_FLAG == 1 || NIVEAU_2_FLAG == 1) {
+                if (sep.at(0) == "camera") {
+                    vector<string> vectorOfCylinder = split(sep.at(1), ',');
+                    Vect cam(stod(vectorOfCylinder.at(0)), stod(vectorOfCylinder.at(1)), stod(vectorOfCylinder.at(2)));
+                    cout << vectorOfCylinder.at(0) << endl;
+                    cameraPosition = Vect(stod(vectorOfCylinder.at(0)), stod(vectorOfCylinder.at(1)),
+                                          stod(vectorOfCylinder.at(2)));
+                    if (NIVEAU_2_FLAG == 1) {
+                        return;
+                    }
+                }
+            }
+            //cout << sep.at(0) << endl;
             if (sep.at(0) == "triangle") {
                 vector<string> vectorOfSphere = split(sep.at(1), ',');
                 Vect A(stod(vectorOfSphere.at(0)), stod(vectorOfSphere.at(1)), stod(vectorOfSphere.at(2)));
@@ -521,6 +503,7 @@ void Parser(char *inputFile, vector<Object *> &scene_objects) {
         cout << "Unable to open file";
 
     }
+
 }
 
 
@@ -534,7 +517,6 @@ static void Exit(void) {
 }
 
 
-
 /**
  * @method: action1
  * @description: permet d'enregister le fichier quand on est au niveau 3 avec OpenGL
@@ -542,10 +524,6 @@ static void Exit(void) {
 static void action1(void) {
     booleanEnregistrementFichier = 1;
 }
-
-
-
-
 
 
 /**
@@ -570,7 +548,6 @@ static void Dessin(void) {
     Camera scene_cam(cameraPosition, cameradirection, cameraright, cameradown);
 
 
-
     Vect light_position;
     Light scene_light;
 
@@ -585,14 +562,11 @@ static void Dessin(void) {
     }
 
 
-
-
-
     double xamnt, yamnt;
-    int thisone;
+    int currentPixel;
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            thisone = y * width + x;
+            currentPixel = y * width + x;
             if (width > height) {
                 xamnt = ((x + 0.5) / width) * aspectratio - (((width - height) / (double) height) / 2);
                 yamnt = ((height - y) + 0.5) / height;
@@ -619,17 +593,17 @@ static void Dessin(void) {
                     intersections.push_back(scene_objects.at(index)->findIntersection(cam_ray));
                 }
 
-                //the object closest to the camera
+                //L'objet le plus proche de l'origine de la camera
                 int index_of_closest_Object = closestObject(intersections);
                 //cout << index_of_closest_Object;
-                //return color
+                //On cherche sa couleur
                 if (index_of_closest_Object == -1) {
-                    //set the background black
-                    pixels[thisone].r = 0;
-                    pixels[thisone].g = 0;
-                    pixels[thisone].b = 0;
+                    //Il y'a pas d'intersection donc on met le fond en couleur noire
+                    pixels[currentPixel].r = 0;
+                    pixels[currentPixel].g = 0;
+                    pixels[currentPixel].b = 0;
                 } else {
-                    // index corresponds to an object in our scene
+                    // il y a intersection. Determinons maintenant sa couleur
                     if (intersections.at(index_of_closest_Object) > accuracy) {
 
                         //Determine the position and direction vectors at the point of intersection
@@ -638,10 +612,11 @@ static void Dessin(void) {
                         Vect intersecting_ray_direction = cam_ray_direction;
 
 
+                        Color intersection_color = getColorAt(intersection_position, intersecting_ray_direction,
+                                                              scene_objects, index_of_closest_Object, accuracy,
+                                                              light_sources, ambientlight);
 
-                        Color intersection_color = getColorAt(intersection_position, intersecting_ray_direction, scene_objects, index_of_closest_Object, accuracy, light_sources, ambientlight);
-
-                        pixels[thisone] = intersection_color.returnForPixelColor();
+                        pixels[currentPixel] = intersection_color.returnForPixelColor();
                     }
                 }
             }
@@ -658,10 +633,10 @@ static void Dessin(void) {
 
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            thisone = y * height + x;
-            rgb[y][x][0] = (pixels[thisone].r);
-            rgb[y][x][1] = (pixels[thisone].g);
-            rgb[y][x][2] = (pixels[thisone].b);
+            currentPixel = y * height + x;
+            rgb[y][x][0] = (pixels[currentPixel].r);
+            rgb[y][x][1] = (pixels[currentPixel].g);
+            rgb[y][x][2] = (pixels[currentPixel].b);
         }
     }
 
@@ -678,20 +653,20 @@ static void Dessin(void) {
 }
 
 
-
-
-
 /**
  * @method: niveau1
  * @description: Fonction de dessin du niveau 1;
 **/
 int niveau1() {
 
-    Vect cameraPosition(250, 10, -5);
+    vector<Object *> scene_objects;
+    Parser(inputFile, scene_objects, cameraPosition);
+
+    cout << "CAMERA POSITION " << cameraPosition.getVectX() << "--" << cameraPosition.getVectY() << "--" <<
+    cameraPosition.getVectZ() << endl;
 
     //le point ou la camera va regarder
     Vect pointToLook(0, 0, 0);
-
 
 
     //Là ou la camera va regarder. Difference entre le point ou la camera va regarder et la camera
@@ -722,28 +697,31 @@ int niveau1() {
     Plane scene_plane(YVect, -1, gray);
 
 
-    vector<Object *> scene_objects;
-
-
-    Parser(inputFile, scene_objects);
-
     scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
 
 
     double xamnt, yamnt;
 
-    int thisone;
+    int currentPixel;
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            thisone = y * width + x;
+            currentPixel = y * width + x;
+
+
+
+            /*Configuration de l'ecran*/
             if (width > height) {
+                /*L'image est en panoramique*/
+                /*On ajoute 0.5 car on veut que le rayon traversant le pixel touche le milieu du pixel et non les bords*/
                 xamnt = ((x + 0.5) / width) * aspectratio - (((width - height) / (double) height) / 2);
                 yamnt = ((height - y) + 0.5) / height;
             } else if (height > width) {
+                /*L'image est en portrait*/
                 xamnt = (x + 0.5) / width;
                 yamnt = (((height - y) + 0.5) / height) / aspectratio - (((height - width) / (double) width) / 2);
             }
             else {
+                /*L'image est carré*/
                 xamnt = (x + 0.5) / width;
                 yamnt = ((height - y) + 0.5) / height;
             }
@@ -760,17 +738,16 @@ int niveau1() {
             for (int index = 0; index < scene_objects.size(); index++) {
                 intersections.push_back(scene_objects.at(index)->findIntersection(cam_ray));
             }
-            //the object closest to the camera
+            //L'objet le plus proche de l'origine de la camera
             int index_of_closest_Object = closestObject(intersections);
-            //cout << index_of_closest_Object;
-            //return color
+            //On cherche sa couleur
             if (index_of_closest_Object == -1) {
-                //set the background black
-                pixels[thisone].r = 0;
-                pixels[thisone].g = 0;
-                pixels[thisone].b = 0;
+                //Il y'a pas d'intersection donc on met le fond en couleur noire
+                pixels[currentPixel].r = 0;
+                pixels[currentPixel].g = 0;
+                pixels[currentPixel].b = 0;
             } else {
-                // index corresponds to an object in our scene
+                // il y a intersection. Determinons maintenant sa couleur
                 if (intersections.at(index_of_closest_Object) > accuracy) {
 
                     //Determine the position and direction vectors at the point of intersection
@@ -781,7 +758,7 @@ int niveau1() {
                     Color intersection_color = getColorAt(intersection_position, intersecting_ray_direction,
                                                           scene_objects, index_of_closest_Object, accuracy,
                                                           light_sources, ambientlight);
-                    pixels[thisone] = intersection_color.returnForPixelColor();
+                    pixels[currentPixel] = intersection_color.returnForPixelColor();
                 }
             }
 
@@ -795,15 +772,13 @@ int niveau1() {
 }
 
 
-
-
 /**
  * @method: niveau2
  * @description: Fonction de dessin du niveau 2;
 **/
 int niveau2(int ps) {
-
-
+    Parser(inputFile, scene_objects, cameraPosition);
+    cout << "CAMERA POSITION " << cameraPosition.getVectX() << "--" << cameraPosition.getVectY() << "--" <<endl;
 
     Vect light_position;
     Light scene_light;
@@ -826,19 +801,16 @@ int niveau2(int ps) {
 
     vector<Object *> scene_objects;
 
-//    Parser(inputFile, scene_objects);
     generatorFibonacci(scene_objects);
     generatorSpyral(scene_objects);
-
-//    scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
 
 
     double xamnt, yamnt;
 
-    int thisone;
+    int currentPixel;
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            thisone = y * width + x;
+            currentPixel = y * width + x;
             if (width > height) {
                 xamnt = ((x + 0.5) / width) * aspectratio - (((width - height) / (double) height) / 2);
                 yamnt = ((height - y) + 0.5) / height;
@@ -863,17 +835,17 @@ int niveau2(int ps) {
             for (int index = 0; index < scene_objects.size(); index++) {
                 intersections.push_back(scene_objects.at(index)->findIntersection(cam_ray));
             }
-            //the object closest to the camera
+            //L'objet le plus proche de l'origine de la camera
             int index_of_closest_Object = closestObject(intersections);
             //cout << index_of_closest_Object;
-            //return color
+            //On cherche sa couleur
             if (index_of_closest_Object == -1) {
-                //set the background black
-                pixels[thisone].r = 0;
-                pixels[thisone].g = 0;
-                pixels[thisone].b = 0;
+                //Il y'a pas d'intersection donc on met le fond en couleur noire
+                pixels[currentPixel].r = 0;
+                pixels[currentPixel].g = 0;
+                pixels[currentPixel].b = 0;
             } else {
-                // index corresponds to an object in our scene
+                // il y a intersection. Determinons maintenant sa couleur
                 if (intersections.at(index_of_closest_Object) > accuracy) {
 
                     //Determine the position and direction vectors at the point of intersection
@@ -884,7 +856,7 @@ int niveau2(int ps) {
                     Color intersection_color = getColorAt(intersection_position, intersecting_ray_direction,
                                                           scene_objects, index_of_closest_Object, accuracy,
                                                           light_sources, ambientlight);
-                    pixels[thisone] = intersection_color.returnForPixelColor();
+                    pixels[currentPixel] = intersection_color.returnForPixelColor();
                 }
             }
 
@@ -918,7 +890,6 @@ void moveRight(void) {
 }
 
 
-
 /**
  * @method: niveau3
  * @description: Fonction principale de génération du niveau 3;
@@ -930,9 +901,9 @@ int niveau3() {
     Plane scene_plane(YVect, -1, Color((double) 10));
 
 
-      Parser(inputFile, scene_objects);
+    Parser(inputFile, scene_objects, cameraPosition);
     //generatorFibonacci(scene_objects);
-   // generatorSpyral(scene_objects);
+    // generatorSpyral(scene_objects);
 
 
 
@@ -941,18 +912,12 @@ int niveau3() {
 
 
 
-
-
-
-
-
-
     //source de lumière
-   /* Vect light_position(50, 78, 70);
-    Light scene_light(light_position, white_light);
+    /* Vect light_position(50, 78, 70);
+     Light scene_light(light_position, white_light);
 
 
-    light_sources.push_back(dynamic_cast<Source *>(&scene_light));*/
+     light_sources.push_back(dynamic_cast<Source *>(&scene_light));*/
 
 
 
@@ -962,7 +927,6 @@ int niveau3() {
     g3x_SetScrollWidth(6);
     g3x_CreateScrollv_d("am", &ambientlight, 0.1, 1.0, 1.0, "Intensité de la lumiere ambiante");
     g3x_CreateScrollv_i("ps", &nombreRayonParPixel, 1, 10, 1.0, "nombre de rayon par pixel");
-
 
 
     g3x_SetScrollWidth(4);
@@ -983,7 +947,6 @@ int niveau3() {
 
     g3x_SetExitFunction(Exit);     /* la fonction de sortie */
     g3x_SetDrawFunction(Dessin);     /* la fonction de Dessin */
-    //g3x_SetAnimFunction(Anim);
 
 
 
@@ -991,13 +954,6 @@ int niveau3() {
     return g3x_MainStart();
 
 }
-
-
-
-
-
-
-
 
 
 /**
@@ -1011,23 +967,12 @@ void usage() {
 }
 
 
-
-
-
-
-
-
-
-
-
 int main(int argc, char *argv[]) {
 
     cout << "rendering ..." << endl;
 
     nombreRayonParPixel = 1;
-    int NIVEAU_1_FLAG = 0;
-    int NIVEAU_2_FLAG = 0;
-    int NIVEAU_3_FLAG = 0;
+
 
     char opt;
     if (argc == 1) {
