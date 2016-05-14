@@ -326,7 +326,7 @@ void generatorFibonacci(vector<Object *> &scene_objects) {
     Cylinder *scene_cylinder = new Cylinder(base, sommet, 2, RandomColor());
     scene_objects.push_back(scene_cylinder);
 
-
+cout <<"Génération de la scene, cela prendra quelques secondes, Merci de patiencer..."<<endl;
     for (int i = 2; i < 200; i++) {
         angle = 0.1 * i;
         x = (a + b * angle) * cos(angle);
@@ -977,7 +977,8 @@ int niveau3() {
 **/
 void usage() {
     cout <<
-    "Pour le niveau 1 la commande a lancer est la suivante : \n -> lray -n 1 -i <mon_fichier.format> -o image.ppm \n Pour le niveau 2 la commande est la suivante : \n -> lray -n 2 -ps 16 -i <mon_fichier.format> -o image.ppm "
+    "Pour le niveau 1 la commande a lancer est la suivante : \n -> lray -n 1 -i <mon_fichier.format> -o image.ppm \n "
+            "Pour le niveau 2 la commande est la suivante : \n -> lray -n 2 -p 16 -i <mon_fichier.format> -o image.ppm "
             "\n Pour le niveau 3 : \n -> lray -n 3 -i <mon_fichier.format>" << endl;
 }
 
@@ -1035,7 +1036,7 @@ int main(int argc, char *argv[]) {
                 break;
             }
             case 'p': {
-                cout << "Nombre de rayon par pixel = " << optarg << endl;
+                cout << "PSNombre de rayon par pixel = " << optarg << endl;
                 nombreRayonParPixel = stoi(optarg);
                 break;
             }
