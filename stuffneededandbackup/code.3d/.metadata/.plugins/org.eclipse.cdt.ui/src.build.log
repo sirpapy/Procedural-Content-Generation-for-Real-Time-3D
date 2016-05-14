@@ -1,0 +1,6 @@
+15:18:47 **** Build of configuration Default for project src ****
+make all 
+make: *** No rule to make target 'all'.  Stop.
+
+15:18:47 Build Finished (took 81ms)
+
