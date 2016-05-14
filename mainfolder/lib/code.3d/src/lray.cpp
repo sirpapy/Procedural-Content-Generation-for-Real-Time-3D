@@ -39,7 +39,7 @@
 using namespace std;
 
 
-void Parser(vector<Object *> &scene_objects);
+void Parser(char *inputFile, vector<Object *> &scene_objects);
 
 void generator(vector<Object *> &scene_objects);
 
@@ -60,12 +60,102 @@ Color crimson(0.862745, 0.0784314, 0.235294, 0);
 Color seagreen(0.180392, 0.545098, 0.341176, 0.3);
 
 
+
+
+char *inputFile = "text/figure.txt";
+char *outputFile = "lrayOutput.bmp";
+int booleanEnregistrementFichier =0;
+
+int dpi = 72;
+int width = 640;
+int height = 480;
+int n = width * height;
+RGBType *pixels = new RGBType[n];
+double ambientlight = 0.35;
+
+//Pour des erreurs de calculs on doit empecher que l'intersection ait lieu a linterieur d'un object
+//Cette variable permet d'être sur que cela soit a la surface en ajoutant un epsilon
+double accuracy = 0.000001;
+
+double aspectratio = (double) width / (double) height;
+
+
+Vect OVect(0, 0, 0);
+Vect XVect(1, 0, 0);
+Vect YVect(0, 1, 0);
+Vect ZVect(0, 0, 1);
+
+Vect cameraPosition(250, 10, -5);
+
+//le point ou la camera va regarder
+Vect pointToLook(0, 0, 0);
+//Vect diff_btw(cameraPosition.getVectX() - pointToLook.getVectX(), cameraPosition.getVectY() - pointToLook.getVectY(), cameraPosition.getVectZ() - pointToLook.getVectZ());
+
+
+
+//Là ou la camera va regarder. Difference entre le point ou la camera va regarder et la camera
+Vect cameradirection = Vect(cameraPosition.getVectX() - pointToLook.getVectX(),
+                            cameraPosition.getVectY() - pointToLook.getVectY(),
+                            cameraPosition.getVectZ() - pointToLook.getVectZ()).negative().normalize();
+
+
+Vect cameraright = YVect.crossProduct(cameradirection).normalize();
+Vect cameradown = cameraright.crossProduct(cameradirection).normalize();
+Camera scene_cam(cameraPosition, cameradirection, cameraright, cameradown);
+
+vector<Object *> scene_objects;
+//Tableau pour avoir plusieurs sources de lumière
+vector<Source *> light_sources;
+
+
+
 double fRand(double fMin, double fMax) {
     double f = (double) rand() / RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
 
-Color pickAColor() {
+Color pickAColor(int color, double special) {
+    switch (color) {
+        case 0: {
+            Color white_light(1.0, 1.0, 1.0, special);
+            return white_light;
+        }
+        case 1: {
+            Color maroon(0.6, 0.2, 0.0, special);
+            return maroon;
+        }
+        case 2: {
+            Color gold(1.0, 0.843137, 0.0, special);
+            return gold;
+        }
+        case 3: {
+            Color gray(0.5, 0.5, 0.5, special);
+            return gray;
+        }
+        case 4: {
+            Color darkturquoise(0.0, 0.807843, 0.819608, special);
+            return darkturquoise;
+        }
+        case 5: {
+            Color crimson(0.862745, 0.0784314, 0.235294, special);
+            return crimson;
+        }
+        case 6: {
+            Color firebrick(0.698039, 0.133333, 0.133333, special);
+            return firebrick;
+        }
+        case 7: {
+            Color seagreen(0.180392, 0.545098, 0.341176, special);
+            return seagreen;
+        }
+        default: {
+           Color white_light(1.0, 1.0, 1.0, special);
+            return white_light;
+        }
+    }
+}
+
+Color RandomColor() {
     switch ((int) fRand(0, 7)) {
         case 0:
             return white_light;
@@ -87,7 +177,6 @@ Color pickAColor() {
             return white_light;
     }
 }
-
 
 vector<string> split(string str, char delimiter) {
     vector<string> internal;
@@ -465,11 +554,11 @@ void generator(vector<Object *> &scene_objects) {
 
     Vect sommet(0, -height, 0);
     Vect base(0, height * 2, 0);
-    Cylinder *scene_cylinder = new Cylinder(base, sommet, 2, pickAColor());
+    Cylinder *scene_cylinder = new Cylinder(base, sommet, 2, RandomColor());
     scene_objects.push_back(scene_cylinder);
 
 
-    for (int i = 2; i < 200; i++) {
+    for (int i = 2; i < 50; i++) {
         angle = 0.1 * i;
         x = (a + b * angle) * cos(angle);
         y = (a + b * angle) * sin(angle);
@@ -485,7 +574,7 @@ void generator(vector<Object *> &scene_objects) {
             case 2: {
                 double longueur = 5;
                 double largeur = 10;
-                Rectangle *scene_rectangle = new Rectangle(center, longueur, largeur, pickAColor());
+                Rectangle *scene_rectangle = new Rectangle(center, longueur, largeur, RandomColor());
                 scene_objects.push_back(scene_rectangle);
 
 
@@ -498,12 +587,12 @@ void generator(vector<Object *> &scene_objects) {
                 Vect A(min.getVectX(), min.getVectY(), min.getVectZ());
                 Vect B(min.getVectX() - largeur, min.getVectY(), min.getVectZ());
                 Vect C(min.getVectX() - largeur, min.getVectY() + longueur, 0);
-                Triangle *scene_triangle = new Triangle(A, B, C, pickAColor());
+                Triangle *scene_triangle = new Triangle(A, B, C, RandomColor());
                 scene_objects.push_back(scene_triangle);
                 Vect D(max.getVectX(), max.getVectY() + largeur, max.getVectZ());
 
 
-                Triangle *scene_triangle2 = new Triangle(A, D, C, pickAColor());
+                Triangle *scene_triangle2 = new Triangle(A, D, C, RandomColor());
                 scene_objects.push_back(scene_triangle2);
 
 
@@ -595,7 +684,7 @@ void generator2(vector<Object *> &scene_objects) {
         z += i / 10000 * height;
 
         Vect center(50, x, y);
-        scene_sphere = new Sphere(center, 2, pickAColor());
+        scene_sphere = new Sphere(center, 2, RandomColor());
         scene_objects.push_back(scene_sphere);
         //centeri = (centeri++) % centerX;
 
@@ -605,9 +694,9 @@ void generator2(vector<Object *> &scene_objects) {
 
 }
 
-void Parser(vector<Object *> &scene_objects) {
+void Parser(char *inputFile, vector<Object *> &scene_objects) {
     string line;
-    ifstream myfile("text/figure.txt");
+    ifstream myfile(inputFile);
     if (myfile.is_open()) {
         while (getline(myfile, line)) {
             vector<string> sep = split(line, ':');
@@ -617,7 +706,7 @@ void Parser(vector<Object *> &scene_objects) {
                 Vect A(stod(vectorOfSphere.at(0)), stod(vectorOfSphere.at(1)), stod(vectorOfSphere.at(2)));
                 Vect B(stod(vectorOfSphere.at(3)), stod(vectorOfSphere.at(4)), stod(vectorOfSphere.at(5)));
                 Vect C(stod(vectorOfSphere.at(6)), stod(vectorOfSphere.at(7)), stod(vectorOfSphere.at(8)));
-                Triangle *scene_triangle = new Triangle(A, B, C, pickAColor());
+                Triangle *scene_triangle = new Triangle(A, B, C, pickAColor(stod(sep.at(2)), stod(sep.at(3))));
 
                 scene_objects.push_back(scene_triangle);
             } else if (sep.at(0) == "rectangle") {
@@ -625,14 +714,16 @@ void Parser(vector<Object *> &scene_objects) {
                 vector<string> vectorOfRectangle = split(sep.at(1), ',');
                 Vect centre(stod(vectorOfRectangle.at(0)), stod(vectorOfRectangle.at(1)),
                             stod(vectorOfRectangle.at(2)));
-                Rectangle *scene_rectangle = new Rectangle(centre, stod(sep.at(2)), stod(sep.at(3)), pickAColor());
+                Rectangle *scene_rectangle = new Rectangle(centre, stod(sep.at(2)), stod(sep.at(3)),
+                                                           pickAColor(stod(sep.at(4)), stod(sep.at(5))));
 
                 scene_objects.push_back(scene_rectangle);
 
             } else if (sep.at(0) == "sphere") {
                 vector<string> vectorOfSphere = split(sep.at(1), ',');
                 Vect center(stod(vectorOfSphere.at(0)), stod(vectorOfSphere.at(1)), stod(vectorOfSphere.at(2)));
-                Sphere *scene_sphere = new Sphere(center, stod(sep.at(2)), pickAColor());
+                Sphere *scene_sphere = new Sphere(center, stod(sep.at(2)),
+                                                  pickAColor(stod(sep.at(3)), stod(sep.at(4))));
 
                 scene_objects.push_back(scene_sphere);
 
@@ -640,7 +731,8 @@ void Parser(vector<Object *> &scene_objects) {
                 vector<string> vectorOfCylinder = split(sep.at(1), ',');
                 Vect sommet(stod(vectorOfCylinder.at(0)), stod(vectorOfCylinder.at(1)), stod(vectorOfCylinder.at(2)));
                 Vect base(stod(vectorOfCylinder.at(3)), stod(vectorOfCylinder.at(4)), stod(vectorOfCylinder.at(5)));
-                Cylinder *scene_cylinder = new Cylinder(sommet, base, stod(sep.at(2)), pickAColor());
+                Cylinder *scene_cylinder = new Cylinder(sommet, base, stod(sep.at(2)),
+                                                        pickAColor(stod(sep.at(3)), stod(sep.at(4))));
 
                 scene_objects.push_back(scene_cylinder);
                 //cout << "Un cylindre" ;
@@ -659,43 +751,21 @@ static void Exit(void) {
     /* rien à faire ici puisqu'il n'y a pas d'allocation dynamique */
     fprintf(stdout, "\nbye !\n");
 }
+double xamnt, yamnt;
+
+
+
+
+static void action1(void){
+    booleanEnregistrementFichier=1;
+}
 
 
 static void Dessin(void) {
-
-    int dpi = 72;
-    int width = 640;
-    int height = 480;
-    int n = width * height;
-    RGBType *pixels = new RGBType[n];
-    double ambientlight = 0.35;
-
-    //Pour des erreurs de calculs on doit empecher que l'intersection ait lieu a linterieur d'un object
-    //Cette variable permet d'être sur que cela soit a la surface en ajoutant un epsilon
-    double accuracy = 0.000001;
-
-    double aspectratio = (double) width / (double) height;
+    cout<<"salut"<<endl;
 
 
-    Vect OVect(0, 0, 0);
-    Vect XVect(1, 0, 0);
-    Vect YVect(0, 1, 0);
-    Vect ZVect(0, 0, 1);
-
-    Vect cameraPosition(250, 10, -5);
-
-    //le point ou la camera va regarder
-    Vect pointToLook(0, 0, 0);
-    //Vect diff_btw(cameraPosition.getVectX() - pointToLook.getVectX(), cameraPosition.getVectY() - pointToLook.getVectY(), cameraPosition.getVectZ() - pointToLook.getVectZ());
-
-
-
-
-    //Vect diff_btw(cameraPosition.getVectX() - pointToLook.getVectX(), cameraPosition.getVectY() - pointToLook.getVectY(), cameraPosition.getVectZ() - pointToLook.getVectZ());
-
-
-
-    //Là ou la camera va regarder. Difference entre le point ou la camera va regarder et la camera
+//Là ou la camera va regarder. Difference entre le point ou la camera va regarder et la camera
     Vect cameradirection = Vect(cameraPosition.getVectX() - pointToLook.getVectX(),
                                 cameraPosition.getVectY() - pointToLook.getVectY(),
                                 cameraPosition.getVectZ() - pointToLook.getVectZ()).negative().normalize();
@@ -704,39 +774,6 @@ static void Dessin(void) {
     Vect cameraright = YVect.crossProduct(cameradirection).normalize();
     Vect cameradown = cameraright.crossProduct(cameradirection).normalize();
     Camera scene_cam(cameraPosition, cameradirection, cameraright, cameradown);
-
-
-
-    //source de lumière
-    Vect light_position(50, 78, 70);
-    Light scene_light(light_position, white_light);
-
-
-    //Tableau pour avoir plusieurs sources de lumière
-    vector<Source *> light_sources;
-    light_sources.push_back(dynamic_cast<Source *>(&scene_light));
-
-
-
-
-    //Creation de la sphere
-    Plane scene_plane(YVect, -1, gray);
-
-
-    vector<Object *> scene_objects;
-
-
-    Parser(scene_objects);
-    //generator(scene_objects);
-    //scene_objects = constructor(scene_objects);
-    //int min=-1,max=-1;
-    //PointsLesPlusSepares(min, max, scene_objects, scene_objects.size());
-
-
-    scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
-
-
-    double xamnt, yamnt;
 
 
     for (int x = 0; x < width; x++) {
@@ -826,109 +863,41 @@ static void Dessin(void) {
 //
 //
 
-
-    savebmp("scene.bmp", width, height, dpi, pixels);
-
+if(booleanEnregistrementFichier==1){
+    savebmp("out.bmp", width, height, dpi, pixels);
+    booleanEnregistrementFichier=0;
+}
 
 //    cout<<"salut"<<buffer<<endl;
     glDrawPixels(width, height, GL_RGB, GL_FLOAT, rgb);
 }
 
-
-void niveau1() {
-
-}
-
-
-int niveau2() {
-
-    return 0;
-}
-
-
-int niveau3() {
-    cout << "rendering ..." << endl;
-
-
-
-    Vect OVect(0, 0, 0);
-    Vect XVect(1, 0, 0);
-    Vect YVect(0, 1, 0);
-    Vect ZVect(0, 0, 1);
-    Vect cameraPosition(250, 10, -5);
-
-    //le point ou la camera va regarder
-    Vect pointToLook(0, 0, 0);
-    //Vect diff_btw(cameraPosition.getVectX() - pointToLook.getVectX(), cameraPosition.getVectY() - pointToLook.getVectY(), cameraPosition.getVectZ() - pointToLook.getVectZ());
-
-
-
-    //Là ou la camera va regarder. Difference entre le point ou la camera va regarder et la camera
-    Vect cameradirection = Vect(cameraPosition.getVectX() - pointToLook.getVectX(),
-                                cameraPosition.getVectY() - pointToLook.getVectY(),
-                                cameraPosition.getVectZ() - pointToLook.getVectZ()).negative().normalize();
-
-
-    Vect cameraright = YVect.crossProduct(cameradirection).normalize();
-    Vect cameradown = cameraright.crossProduct(cameradirection).normalize();
-    Camera scene_cam(cameraPosition, cameradirection, cameraright, cameradown);
-
-
-    int dpi = 72;
-    int width = 640;
-    int height = 480;
-    int n = width * height;
-    RGBType *pixels = new RGBType[n];
-    double ambientlight = 0.35;
-
-
-    /* initialisation de la fenêtre graphique et paramétrage Gl */
-    g3x_InitWindow("Lray", width, height);
-
-    g3x_SetScrollWidth(6);
-    g3x_CreateScrollv_d("ray", &ambientlight, 0.1, 1.0, 1.0, "Deplacement lateral camera");
-    g3x_CreateScrollv_d("ang", &ambientlight, 0.0, 1.0, 1.0, "angle rotation   ");
-    g3x_CreateScrollv_d("alf", &ambientlight, 0.0, 1.0, 1.0, "transparence cube");
-
-    g3x_SetScrollWidth(4);
-    g3x_CreateScrollh_d("CAMX", &cameraPosition.x, -255.0, 255.0, 1.0, "Deplacement horizontal camera");
-    g3x_CreateScrollh_d("CAMY", &cameraPosition.y, -255.0, 255.0, 1.0, "intensite lumiere ambiante  ");
-    g3x_CreateScrollh_d("CAMZ", &cameraPosition.z, -255.0, 255.0, 1.0, "intensite lumiere ambiante  ");
-
-
-
-
-    /* action attachées à des touches */
-//    g3x_SetKeyAction('g', action1, "variation de couleur");
-//    g3x_SetKeyAction('G', action2, "variation de couleur");
-//    g3x_SetKeyAction('c', camera_info, "pos./dir. de la camera => terminal");
-
-    /* initialisation d'une carte de couleurs */
-    //g3x_FillColorMap(colmap, MAXCOL);
-    /* définition des fonctions */
-    g3x_SetExitFunction(Exit);     /* la fonction de sortie */
-    g3x_SetDrawFunction(Dessin);     /* la fonction de Dessin */
-    //g3x_SetAnimFunction(Anim);
-
-
-    /* JUSTE POUT ILLUSTRATION DU TRACEUR D'ALLOC EN COMPIL DEGUG */
-    void *ptr = malloc(1);
-
-    /* boucle d'exécution principale */
-
-
-
-
-
-    return g3x_MainStart();
-
-}
-
-int main(int argc, char *argv[]) {
-
-    cout << "rendering ..." << endl;
-
-
+//void creerImage(const char *filename, int w, int h, int dpi, RGBType *data){
+//
+//
+//
+//
+//    FILE *fp = fopen("first.ppm", "wb"); /* b - binary mode */
+//    (void) fprintf(fp, "P6\n%d %d\n1\n", w, h);
+//int thisone;
+//    float rgb[w][h][3];
+//    for (int x = 0; x < w; x++) {
+//        for (int y = 0; y < h; y++) {
+//            thisone = y * h + x;
+//            rgb[y][x][0] = (data[thisone].r);
+//            rgb[y][x][1] = (data[thisone].g);
+//            rgb[y][x][2] = (data[thisone].b);
+//            (void) fwrite(rgb[x][y], 1, 3, fp);
+//        }
+//    }
+//
+//    (void) fclose(fp);
+//
+//
+//
+//
+//}
+int niveau1() {
     int dpi = 72;
     int width = 640;
     int height = 480;
@@ -987,7 +956,106 @@ int main(int argc, char *argv[]) {
     vector<Object *> scene_objects;
 
 
-    Parser(scene_objects);
+    Parser(inputFile, scene_objects);
+    //generator(scene_objects);
+    //scene_objects = constructor(scene_objects);
+    //int min=-1,max=-1;
+    //PointsLesPlusSepares(min, max, scene_objects, scene_objects.size());
+
+
+    scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
+
+
+    double xamnt, yamnt;
+
+
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            thisone = y * width + x;
+            if (width > height) {
+                xamnt = ((x + 0.5) / width) * aspectratio - (((width - height) / (double) height) / 2);
+                yamnt = ((height - y) + 0.5) / height;
+            } else if (height > width) {
+                xamnt = (x + 0.5) / width;
+                yamnt = (((height - y) + 0.5) / height) / aspectratio - (((height - width) / (double) width) / 2);
+            }
+            else {
+                xamnt = (x + 0.5) / width;
+                yamnt = ((height - y) + 0.5) / height;
+            }
+            //l'origine de nos rayons sera l'origine de notre camera
+            Vect cam_ray_origin = scene_cam.getCameraPostion();
+            Vect cam_ray_direction = cameradirection.vectAdd(
+                    cameraright.vectMult(xamnt - 0.5).vectAdd(cameradown.vectMult(yamnt - 0.5))).normalize();
+            Ray cam_ray(cam_ray_origin, cam_ray_direction);
+            vector<double> intersections;
+
+            //Maintenant on fait une boucle pour voir si le rayon qu'on vient de creer va avoir une
+            //intersection avec nos objects
+
+            for (int index = 0; index < scene_objects.size(); index++) {
+                intersections.push_back(scene_objects.at(index)->findIntersection(cam_ray));
+            }
+            //the object closest to the camera
+            int index_of_closest_Object = closestObject(intersections);
+            //cout << index_of_closest_Object;
+            //return color
+            if (index_of_closest_Object == -1) {
+                //set the background black
+                pixels[thisone].r = 0;
+                pixels[thisone].g = 0;
+                pixels[thisone].b = 0;
+            } else {
+                // index corresponds to an object in our scene
+                if (intersections.at(index_of_closest_Object) > accuracy) {
+
+                    //Determine the position and direction vectors at the point of intersection
+                    Vect intersection_position = cam_ray_origin.vectAdd(
+                            cam_ray_direction.vectMult(intersections.at(index_of_closest_Object)));
+                    Vect intersecting_ray_direction = cam_ray_direction;
+
+                    Color intersection_color = getColorAt(intersection_position, intersecting_ray_direction,
+                                                          scene_objects, index_of_closest_Object, accuracy,
+                                                          light_sources, ambientlight);
+                    pixels[thisone] = intersection_color.returnForPixelColor();
+                }
+            }
+
+
+        }
+    }
+
+//    creerImage(outputFile, width, height, dpi, pixels);
+    savebmp(outputFile, width, height, dpi, pixels);
+    return 0;
+}
+
+
+int niveau2(int ps) {
+
+
+    vector<Source *> light_sources;
+
+    for (int i = 0; i < ps; i++) {
+        //source de lumière
+
+        Vect light_position(fRand(0, 100), fRand(0, 100), fRand(0, 100));
+        Light scene_light(light_position, RandomColor());
+
+        //Tableau pour avoir plusieurs sources de lumière
+        light_sources.push_back(dynamic_cast<Source *>(&scene_light));
+    }
+
+
+
+    //Creation de la sphere
+    Plane scene_plane(YVect, -1, gray);
+
+
+    vector<Object *> scene_objects;
+
+    cout << "tffffff" << endl;
+    Parser(inputFile, scene_objects);
     //generator(scene_objects);
     //scene_objects = constructor(scene_objects);
     //int min=-1,max=-1;
@@ -1058,16 +1126,154 @@ int main(int argc, char *argv[]) {
 
     savebmp("scene.bmp", width, height, dpi, pixels);
     return 0;
+}
+
+
+
+int niveau3() {
+    cout << "rendering ..." << endl;
+
+    //Creation de la sphere
+    Plane scene_plane(YVect, -1, gray);
 
 
 
 
 
+    Parser(inputFile, scene_objects);
+    //generator(scene_objects);
+    //scene_objects = constructor(scene_objects);
+    //int min=-1,max=-1;
+    //PointsLesPlusSepares(min, max, scene_objects, scene_objects.size());
 
 
-    //niveau1();
-    //niveau2();
-    //niveau3();
+    scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
+    //source de lumière
+    Vect light_position(50, 78, 70);
+    Light scene_light(light_position, white_light);
+
+
+    light_sources.push_back(dynamic_cast<Source *>(&scene_light));
+
+
+
+    /* initialisation de la fenêtre graphique et paramétrage Gl */
+    g3x_InitWindow("Lray", width, height);
+
+    g3x_SetScrollWidth(6);
+    g3x_CreateScrollv_d("ray", &ambientlight, 0.1, 1.0, 1.0, "Deplacement lateral camera");
+    g3x_CreateScrollv_d("ang", &ambientlight, 0.0, 1.0, 1.0, "angle rotation   ");
+    g3x_CreateScrollv_d("alf", &ambientlight, 0.0, 1.0, 1.0, "transparence cube");
+
+    g3x_SetScrollWidth(4);
+    g3x_CreateScrollh_d("CAMX", &cameraPosition.x, -255.0, 255.0, 1.0, "Deplacement horizontal camera");
+    g3x_CreateScrollh_d("CAMY", &cameraPosition.y, -255.0, 255.0, 1.0, "intensite lumiere ambiante  ");
+    g3x_CreateScrollh_d("CAMZ", &cameraPosition.z, -255.0, 255.0, 1.0, "intensite lumiere ambiante  ");
+
+
+
+
+    /* action attachées à des touches */
+      g3x_SetKeyAction('s', action1, "Enregistrement sous out.bmp");
+//    g3x_SetKeyAction('G', action2, "variation de couleur");
+//    g3x_SetKeyAction('c', camera_info, "pos./dir. de la camera => terminal");
+
+    /* initialisation d'une carte de couleurs */
+    //g3x_FillColorMap(colmap, MAXCOL);
+    /* définition des fonctions */
+    g3x_SetExitFunction(Exit);     /* la fonction de sortie */
+    g3x_SetDrawFunction(Dessin);     /* la fonction de Dessin */
+    //g3x_SetAnimFunction(Anim);
+
+
+
+   /* boucle d'exécution principale */
+    return g3x_MainStart();
+
+}
+
+void usage() {
+    cout <<
+    "Pour le niveau 1 la commande a lancer est la suivante : \n -> lray -n 1 -i <mon_fichier.format> -o image.ppm \n Pour le niveau 2 la commande est la suivante : \n -> lray -n 2 -ps 16 -i <mon_fichier.format> -o image.ppm "
+            "\n Pour le niveau 3 : \n -> lray -n 3 -i <mon_fichier.format>" << endl;
+}
+
+int main(int argc, char *argv[]) {
+
+    cout << "rendering ..." << endl;
+
+    int nombreRayonParPixel = 1;
+    int NIVEAU_1_FLAG = 0;
+    int NIVEAU_2_FLAG = 0;
+    int NIVEAU_3_FLAG = 0;
+
+    char opt;
+    if (argc == 1) {
+        usage();
+        exit(1);
+    }
+
+    /*use function getopt to get the arguments with option."hu:p:s:v" indicate
+      that option h,v are the options without arguments while u,p,s are the
+      options with arguments*/
+    while ((opt = getopt(argc, argv, "n:i:o:p:")) != -1) {
+        switch (opt) {
+            case 'n': {
+                switch (stoi(optarg)) {
+                    case 1: {
+                        cout << "Niveau 1" << endl;
+                        NIVEAU_1_FLAG = 1;
+                        break;
+                    }
+                    case 2: {
+                        cout << "Niveau 2" << endl;
+                        NIVEAU_2_FLAG = 1;
+                        break;
+                    }
+                    case 3: {
+                        cout << "Niveau 3" << endl;
+                        NIVEAU_3_FLAG = 1;
+                        break;
+                    }
+                    default: {
+                        usage();
+                        exit(1);
+                    }
+                }
+                break;
+            }
+            case 'i': {
+                cout << "Fichier input = " << optarg << endl;
+                inputFile = optarg;
+                break;
+            }
+            case 'o': {
+                cout << "Fichier output = " << optarg << endl;
+                outputFile = optarg;
+                break;
+            }
+            case 'p': {
+                cout << "Nombre de rayon par pixel = " << optarg << endl;
+                nombreRayonParPixel = stoi(optarg);
+                break;
+            }
+            default: {
+                usage();
+                exit(1);
+            }
+        }
+    }
+
+
+    if (NIVEAU_1_FLAG == 1) {
+        niveau1();
+    }
+    if (NIVEAU_2_FLAG == 1) {
+        niveau2(nombreRayonParPixel);
+    }
+    if (NIVEAU_3_FLAG == 1) {
+        niveau3();
+    }
 
 
 }
