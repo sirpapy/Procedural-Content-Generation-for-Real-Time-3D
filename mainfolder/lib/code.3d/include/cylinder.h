@@ -118,6 +118,8 @@ public:
                 pos = ray.getRayOrigin().vectAdd(ray.getRayDirection().vectMult(t));
 
 
+                if ((normaxis.dotProduct(pos.vectAdd(inverseSommet)) > 0) &&
+                    (negnormaxis.dotProduct(pos.vectAdd(inverseBase)) > 0))
                     return t;
             }
             else if (discriminant > 0) {

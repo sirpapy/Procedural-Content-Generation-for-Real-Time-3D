@@ -203,12 +203,12 @@ Color getColorAt(Vect intersection_position, Vect intersecting_ray_direction, ve
     /*Calcul de la texture pour le sol*/
     if (closestObjectColor.getColorSpecial() == 10) {
         int square = (int) floor(intersection_position.getVectX()) + (int) floor(intersection_position.getVectZ());
-        if ((square % 12) == 0) {
+        if ((square % 4) == 0) {
             closestObjectColor = Color(0, 0, 0, 10);
         } else {
-            if ((square % 5) == 0) {
+
                 closestObjectColor = Color(0.4, 0.4, 0.4, 10);
-            }
+
         }
     }
     /*fin de calcul de la texture*/
@@ -327,7 +327,7 @@ void generatorFibonacci(vector<Object *> &scene_objects) {
     scene_objects.push_back(scene_cylinder);
 
 
-    for (int i = 2; i < 50; i++) {
+    for (int i = 2; i < 200; i++) {
         angle = 0.1 * i;
         x = (a + b * angle) * cos(angle);
         y = (a + b * angle) * sin(angle);
@@ -390,14 +390,14 @@ void generatorSpyral(vector<Object *> &scene_objects) {
     double angle;
     int a = 10, b = 10;
     int height = 100;
-    for (int i = 2; i < 100; i++) {
+    for (int i = 2; i < 300; i++) {
         angle = 0.1 * i;
         x = (a + b * angle) * cos(angle);
         y = (a + b * angle) * sin(angle);
         z += i / 10000 * height;
 
         Vect center(50, x, y);
-        scene_sphere = new Sphere(center, 2, RandomColor());
+        scene_sphere = new Sphere(center, 4, RandomColor());
         scene_objects.push_back(scene_sphere);
 
 
@@ -694,7 +694,7 @@ int niveau1() {
 
 
     //Creation de la sphere
-    Plane scene_plane(YVect, -1, gray);
+    Plane scene_plane(YVect, -1, Color((double) 10));
 
 
     scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
@@ -778,7 +778,22 @@ int niveau1() {
 **/
 int niveau2(int ps) {
     Parser(inputFile, scene_objects, cameraPosition);
-    cout << "CAMERA POSITION " << cameraPosition.getVectX() << "--" << cameraPosition.getVectY() << "--" <<endl;
+    cout << "CAMERA POSITION " << cameraPosition.getVectX() << "--" << cameraPosition.getVectY() << "--" << cameraPosition.getVectZ() << "--" <<endl;
+
+    //Là ou la camera va regarder. Difference entre le point ou la camera va regarder et la camera
+    Vect cameradirection = Vect(cameraPosition.getVectX() - pointToLook.getVectX(),
+                                cameraPosition.getVectY() - pointToLook.getVectY(),
+                                cameraPosition.getVectZ() - pointToLook.getVectZ()).negative().normalize();
+
+
+    Vect cameraright = YVect.crossProduct(cameradirection).normalize();
+    Vect cameradown = cameraright.crossProduct(cameradirection).normalize();
+    Camera scene_cam(cameraPosition, cameradirection, cameraright, cameradown);
+
+
+
+
+
 
     Vect light_position;
     Light scene_light;
@@ -796,13 +811,13 @@ int niveau2(int ps) {
 
 
     //Creation de la sphere1
-    Plane scene_plane(YVect, -1, gray);
+    Plane scene_plane(YVect, -1, Color(0,0,0,10));
 
 
     vector<Object *> scene_objects;
 
     generatorFibonacci(scene_objects);
-    generatorSpyral(scene_objects);
+//    generatorSpyral(scene_objects);
 
 
     double xamnt, yamnt;
