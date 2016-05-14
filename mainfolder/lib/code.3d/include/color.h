@@ -90,12 +90,12 @@ public:
 
 
     /**
- * @method: clip
+ * @method: rogner
  * @description: Permet de normaliser les couleurs. Cest à dire Si la valeur d'une couleur dépasse 1
                * on le remet à 1 et si inferieur à 0, on le remet à 0
  * @return retourne la couleur normalisé
 **/
-    Color clip(){
+    Color rogner(){
         double sommeCouleurs = red+blue+green;
         double testeurDeLimite = sommeCouleurs - 3;
         if(testeurDeLimite>0){
