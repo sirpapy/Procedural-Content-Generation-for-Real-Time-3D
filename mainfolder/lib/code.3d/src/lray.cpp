@@ -60,11 +60,10 @@ Color crimson(0.862745, 0.0784314, 0.235294, 0);
 Color seagreen(0.180392, 0.545098, 0.341176, 0.3);
 
 
-
-
 char *inputFile = "text/figure.txt";
 char *outputFile = "lrayOutput.bmp";
-int booleanEnregistrementFichier =0;
+int booleanEnregistrementFichier = 0;
+double nombreRayonParPixel;
 
 int dpi = 72;
 int width = 640;
@@ -85,11 +84,36 @@ Vect XVect(1, 0, 0);
 Vect YVect(0, 1, 0);
 Vect ZVect(0, 0, 1);
 
-Vect cameraPosition(250, 10, -5);
+Vect cameraPosition(250, 90, -5);
 
 //le point ou la camera va regarder
 Vect pointToLook(0, 0, 0);
 //Vect diff_btw(cameraPosition.getVectX() - pointToLook.getVectX(), cameraPosition.getVectY() - pointToLook.getVectY(), cameraPosition.getVectZ() - pointToLook.getVectZ());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*That would be a matrix operation on the camera's 3-axis coordinate system (camdir, camright, camdown), or for just a rotation about one axis you could write a function with input from desired rotation axis and an angle to transform the orthogonal 2-D system (an arbitrary axis 90 deg from input axis and another axis 90 deg from both of those) with is basically what the computer does when you input a new camdir manually﻿*/
+
+
+
 
 
 
@@ -108,12 +132,25 @@ vector<Object *> scene_objects;
 vector<Source *> light_sources;
 
 
+/**
+ * @method:
+ * @description:
+ * @param   ray   (Ray)  -- tracer object that defines its point and direction in 3-space.
+ * @return.
+**/
 
 double fRand(double fMin, double fMax) {
     double f = (double) rand() / RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
 
+
+/**
+ * @method: pickAColor
+ * @description: Permet de choisir une couleur et ainsi definir sa valeur spéciale
+ * @param  un entier correspondant à la couleur voulu et sa valeur speciale
+ * @return une couleur
+**/
 Color pickAColor(int color, double special) {
     switch (color) {
         case 0: {
@@ -149,12 +186,18 @@ Color pickAColor(int color, double special) {
             return seagreen;
         }
         default: {
-           Color white_light(1.0, 1.0, 1.0, special);
+            Color white_light(1.0, 1.0, 1.0, special);
             return white_light;
         }
     }
 }
 
+
+/**
+ * @method: RandomColor
+ * @description: Permet de choisir de manière "aleatoire" une couleur
+ * @return Une couleur
+**/
 Color RandomColor() {
     switch ((int) fRand(0, 7)) {
         case 0:
@@ -178,6 +221,14 @@ Color RandomColor() {
     }
 }
 
+
+/**
+ * @method: split
+ * @description: Permet de splitter une chaine de caractére grace à un délimiteur en plusieurs sous chaines
+ * @param   str String, delimiter char
+ * @return liste de sous chaines.
+**/
+
 vector<string> split(string str, char delimiter) {
     vector<string> internal;
     stringstream ss(str); // Turn the string into a stream.
@@ -191,6 +242,12 @@ vector<string> split(string str, char delimiter) {
 }
 
 
+/**
+ * @method: findMaxValue
+ * @description: permet de trouver la valeur maximale d'une liste
+ * @param   list vector<double>
+ * @return le max
+**/
 double findMaxValue(vector<double> list) {
     double max = 0;
     for (int i = 0; i < list.size(); i++) {
@@ -202,6 +259,13 @@ double findMaxValue(vector<double> list) {
 }
 
 
+/**
+ * @method: closestObject
+ * @description: Quand il ya plusieurs intersection on doit trouver la plus petite face toucher par le rayon et être affiché.
+ * @param   object_intersections vector<double> liste des intersection
+ * @return l'index à afficher
+**/
+
 int closestObject(vector<double> object_intersections) {
 
     int minIndex;
@@ -212,11 +276,11 @@ int closestObject(vector<double> object_intersections) {
         return -1;
     }
     else if (object_intersections.size() == 1) {
-        if (object_intersections.at(0) > 0) {
-            // if that intersection is greater than zero then its our index of mininum value
+        if (object_intersections.at(0) == 0) {
+            // le seul point d'intersection
             return 0;
         } else {
-            //otherwise the only intersection value is negative (the ray missed everything
+            //Le rayon n'a pas fait d'intersection
             return -1;
 
         }
@@ -253,8 +317,13 @@ int thisone;
 
 #define FLT_MAX 3.40282347E+38F
 
-//Returns indices imin and imax into pt[] array of the least and
-//most, respectively, distant points along the direction dir
+
+/**
+ * @method:  pointLePlusEloigneSelonDirection
+ * @description: permet de chercher le point le plus eloigné et le plus proche d'un point selon une direction
+ * @param   la direction, la liste des objects, le nombre d'objet
+ * @return le min et le max
+**/
 
 void pointLePlusEloigneSelonDirection(Vect dir, vector<Object *> objects, int n, int *imin, int *imax) {
     float minproj = FLT_MAX, maxproj = -FLT_MAX;
@@ -264,7 +333,6 @@ void pointLePlusEloigneSelonDirection(Vect dir, vector<Object *> objects, int n,
             minproj = proj;
             *imin = i;
         }
-        //keep track of most distant point along direction vector
         if (proj > maxproj) {
             maxproj = proj;
             *imax = i;
@@ -272,6 +340,21 @@ void pointLePlusEloigneSelonDirection(Vect dir, vector<Object *> objects, int n,
     }
 
 }
+
+
+
+
+
+
+
+
+
+/**
+ * @method: PointsLesPlusSepares
+ * @description: les deux points les plus séparés
+ * @param   la liste des objects, et le nombre de points
+ * @return les deux points
+**/
 
 
 // Compute indices to the two most separated points of the (up to) six points
@@ -289,9 +372,8 @@ void PointsLesPlusSepares(int &min, int &max, vector<Object *> objects,
         if (objects.at(i)->getSBBoxCenter().getVectZ() > objects.at(maxZ)->getSBBoxCenter().getVectZ()) { maxZ = i; }
 
 
-        // cout <<" Nom : "<<objects.at(i)->getName()<<" MaxXXXXXXX = "<<objects.at(i)->getVolume()<<" Centre : "<<objects.at(i)->getCenter().getVectX()<<endl;
     }
-    // Compute the squared distances for the three pairs of points
+
     float dist2x = objects.at(maxX)->getSBBoxCenter().vectAdd(objects.at(minX)->getSBBoxCenter().negative()).dotProduct(
             objects.at(maxX)->getSBBoxCenter().vectAdd(objects.at(minX)->getSBBoxCenter().negative()));
     float dist2y = objects.at(maxY)->getSBBoxCenter().vectAdd(objects.at(minY)->getSBBoxCenter().negative()).dotProduct(
@@ -313,19 +395,48 @@ void PointsLesPlusSepares(int &min, int &max, vector<Object *> objects,
 }
 
 
+
+
+
+
+
+
+/**
+ * @method:  getColorAt
+ * @description:  permet de recuperer la couleur des objects (calculer les ombrages, leurs textures etc...)
+ * @param  la position de l'intersection, la direction du rayon, et la liste des objects
+ * @return.
+**/
 //Fonction permettant d'implémenter les ombres ainsi que les réflections
 Color getColorAt(Vect intersection_position, Vect intersecting_ray_direction, vector<Object *> scene_objects,
                  int index_of_closest_Object, double accuracy, vector<Source *> light_sources, double ambientlight) {
     Color closestObjectColor = scene_objects.at(index_of_closest_Object)->getColor();
     Vect closestObjectNormal = scene_objects.at(index_of_closest_Object)->getNormalAt(intersection_position);
 
-    Color final_color(closestObjectColor.colorScalar(ambientlight));
 
+
+    /*Calcul de la texture pour le sol*/
+    if (closestObjectColor.getColorSpecial() == 10) {
+        int square = (int) floor(intersection_position.getVectX()) + (int) floor(intersection_position.getVectZ());
+        if ((square % 12) == 0) {
+            closestObjectColor = Color(0, 0, 0, 10);
+        } else {
+            if ((square % 5) == 0) {
+                closestObjectColor = Color(0.4, 0.4, 0.4, 10);
+            }
+        }
+    }
+    /*fin de calcul de la texture*/
+
+
+
+
+
+    Color final_color(closestObjectColor.colorScalar(ambientlight));
 
     for (int lindex = 0; lindex < light_sources.size(); lindex++) {
         Vect light_direction = light_sources.at(lindex)->getLightPosition().vectAdd(
                 intersection_position.negative()).normalize();
-
 
         float cosinus_angle = closestObjectNormal.dotProduct(light_direction);
 
@@ -336,7 +447,6 @@ Color getColorAt(Vect intersection_position, Vect intersecting_ray_direction, ve
                     intersection_position.negative()).normalize();
 
             float distance_to_light_magnitude = distance_to_light.magnitude();
-
 
 
             //On va creer un nouveau rayon dans la direction de notre point d'intersection
@@ -391,147 +501,12 @@ Color getColorAt(Vect intersection_position, Vect intersecting_ray_direction, ve
 }
 
 
-
-
-
-
-
-
-
-
-
-
-//int main2(int argc, char *argv[]) {
-//
-//    cout << "rendering ..." << endl;
-//
-//
-//    int dpi = 72;
-//    int width = 640;
-//    int height = 480;
-//    int n = width * height;
-//    RGBType *pixels = new RGBType[n];
-//    double ambientlight = 0.2;
-//
-//    //Pour des erreurs de calculs on doit empecher que l'intersection ait lieu a linterieur d'un object
-//    //Cette variable permet d'être sur que cela soit a la surface en ajoutant un epsilon
-//    double accuracy = 0.0000001;
-//
-//    double aspectratio = (double) width / (double) height;
-//
-//
-//    Vect OVect(0, 0, 0);
-//    Vect XVect(1, 0, 0);
-//    Vect YVect(0, 1, 0);
-//    Vect ZVect(0, 0, 1);
-//
-//    Vect cameraPosition(250, 10, -5);
-//
-//    //le point ou la camera va regarder
-//    Vect pointToLook(0, 0, 0);
-//    //Vect diff_btw(cameraPosition.getVectX() - pointToLook.getVectX(), cameraPosition.getVectY() - pointToLook.getVectY(), cameraPosition.getVectZ() - pointToLook.getVectZ());
-//
-//
-//
-//    //Là ou la camera va regarder. Difference entre le point ou la camera va regarder et la camera
-//    Vect cameradirection = Vect(cameraPosition.getVectX() - pointToLook.getVectX(),
-//                                cameraPosition.getVectY() - pointToLook.getVectY(),
-//                                cameraPosition.getVectZ() - pointToLook.getVectZ()).negative().normalize();
-//
-//
-//    Vect cameraright = YVect.crossProduct(cameradirection).normalize();
-//    Vect cameradown = cameraright.crossProduct(cameradirection).normalize();
-//    Camera scene_cam(cameraPosition, cameradirection, cameraright, cameradown);
-//
-//
-//
-//    //source de lumière
-//    Vect light_position(-7, 10, -10);
-//    Light scene_light(light_position, white_light);
-//
-//
-//
-//
-//
-//    //Creation de la sphere
-//    //Plane scene_plane(YVect, -1, gray);
-//
-//
-//    vector<Object *> scene_objects;
-//
-//
-//    Parser(scene_objects);
-//    //generator(scene_objects);
-//    scene_objects = constructor(scene_objects);
-//    int min=-1,max=-1;
-//    PointsLesPlusSepares(min, max, scene_objects, scene_objects.size());
-//
-//
-//    // scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
-//
-//
-//
-//    double xamnt, yamnt;
-//
-//
-//    for (int x = 0; x < width; x++) {
-//        for (int y = 0; y < height; y++) {
-//            thisone = y * width + x;
-//            if (width > height) {
-//                xamnt = ((x + 0.5) / width) * aspectratio - (((width - height) / (double) height) / 2);
-//                yamnt = ((height - y) + 0.5) / height;
-//            } else if (height > width) {
-//                xamnt = (x + 0.5) / width;
-//                yamnt = (((height - y) + 0.5) / height) / aspectratio - (((height - width) / (double) width) / 2);
-//            }
-//            else {
-//                xamnt = (x + 0.5) / width;
-//                yamnt = ((height - y) + 0.5) / height;
-//            }
-//            //l'origine de nos rayons sera l'origine de notre camera
-//            Vect cam_ray_origin = scene_cam.getCameraPostion();
-//            Vect cam_ray_direction = cameradirection.vectAdd(cameraright.vectMult(xamnt - 0.5).vectAdd(cameradown.vectMult(yamnt - 0.5))).normalize();
-//            Ray cam_ray(cam_ray_origin, cam_ray_direction);
-//            vector<double> intersections;
-//
-//            //Maintenant on fait une boucle pour voir si le rayon qu'on vient de creer va avoir une
-//            //intersection avec nos objects
-//
-//            for (int index = 0; index < scene_objects.size(); index++) {
-//                intersections.push_back(scene_objects.at(index)->findIntersection(cam_ray));
-//            }
-//            //the object closest to the camera
-//            int index_of_closest_Object = closestObject(intersections);
-//            //cout << index_of_closest_Object;
-//            //return color
-//            if (index_of_closest_Object == -1) {
-//                //set the background black
-//                pixels[thisone].r = 0;
-//                pixels[thisone].g = 0;
-//                pixels[thisone].b = 0;
-//            } else {
-//                // index corresponds to an object in our scene
-//                if(intersections.at(index_of_closest_Object)> accuracy ){
-//
-//                    //Determine the position and direction vectors at the point of intersection
-//                    Vect intersection_position = cam_ray_origin.vectAdd(cam_ray_direction.vectMult(intersections.at(index_of_closest_Object)));
-//                    Vect intersecting_ray_direction = cam_ray_direction;
-//
-//                    Color this_color = scene_objects.at(index_of_closest_Object)->getColor();
-//                    pixels[thisone] = this_color.returnForPixelColor();
-//                }
-//            }
-//
-//
-//        }
-//    }
-//
-//    savebmp("scene.bmp", width, height, dpi, pixels);
-//    return 0;
-//
-//
-//}
-
+/**
+ * @method:
+ * @description:
+ * @param   ray   (Ray)  -- tracer object that defines its point and direction in 3-space.
+ * @return.
+**/
 int fib(int x) {
     if (x == 0)
         return 0;
@@ -543,6 +518,12 @@ int fib(int x) {
 }
 
 
+/**
+ * @method:
+ * @description:
+ * @param   ray   (Ray)  -- tracer object that defines its point and direction in 3-space.
+ * @return.
+**/
 void generator(vector<Object *> &scene_objects) {
 
     Sphere *scene_sphere;
@@ -611,38 +592,23 @@ void generator(vector<Object *> &scene_objects) {
 
 }
 
-/*void tricroissant( int tab[], int tab_size)
-{
-  int i=0;
-  int tmp=0;
-  int j=0;
 
-  for(i = 0; i < tab_size; i++)          //On veut remplir la case i du tableau
-    {
-      for(j = i+1; j < tab_size; j++)    //On vérifie s'il n'y a pas de nombre inférieur
-        {                                //Dans les cases suivantes
-          if(tab[j] < tab[i])
-            {
-              tmp = tab[i];              //Si c'est le cas on intervertit les cases
-              tab[i] = tab[j];
-              tab[j] = tmp;
-            }
-        }
-    }
-}*/
-
+/**
+ * @method:
+ * @description:
+ * @param   ray   (Ray)  -- tracer object that defines its point and direction in 3-space.
+ * @return.
+**/
 vector<Object *> constructor(vector<Object *> &S) {
     vector<Object *> P = S;
     Object *tmp;
     Vect origin = Vect(0, 0, 0);
-    //std::sort(P.begin(), P.end());
 
 
     for (int i = 0; i < P.size(); i++) {
         cout << "i: " << i << " Nom: " << P.at(i)->getName() << " Center X : " <<
         P.at(i)->getSBBoxCenter().getVectX() << " Y : " << P.at(i)->getSBBoxCenter().getVectY() << " Z : " <<
         P.at(i)->getSBBoxCenter().getVectZ() << endl;
-        //cout <<"....."<<P.atj(i)->getName()<<"-----"<< P.at(i)->getSBBoxCenter().getVectZ();
     }
 
 
@@ -661,7 +627,6 @@ vector<Object *> constructor(vector<Object *> &S) {
         cout << "i: " << i << " Nom: " << P.at(i)->getName() << " Center X : " <<
         P.at(i)->getSBBoxCenter().getVectX() << " Y : " << P.at(i)->getSBBoxCenter().getVectY() << " Z : " <<
         P.at(i)->getSBBoxCenter().getVectZ() << endl;
-        //cout <<"....."<<P.atj(i)->getName()<<"-----"<< P.at(i)->getSBBoxCenter().getVectZ();
     }
     cout << endl;
 
@@ -669,6 +634,12 @@ vector<Object *> constructor(vector<Object *> &S) {
 }
 
 
+/**
+ * @method:
+ * @description:
+ * @param   ray   (Ray)  -- tracer object that defines its point and direction in 3-space.
+ * @return.
+**/
 void generator2(vector<Object *> &scene_objects) {
 
 
@@ -686,7 +657,6 @@ void generator2(vector<Object *> &scene_objects) {
         Vect center(50, x, y);
         scene_sphere = new Sphere(center, 2, RandomColor());
         scene_objects.push_back(scene_sphere);
-        //centeri = (centeri++) % centerX;
 
 
     }
@@ -694,6 +664,13 @@ void generator2(vector<Object *> &scene_objects) {
 
 }
 
+
+/**
+ * @method:
+ * @description:
+ * @param   ray   (Ray)  -- tracer object that defines its point and direction in 3-space.
+ * @return.
+**/
 void Parser(char *inputFile, vector<Object *> &scene_objects) {
     string line;
     ifstream myfile(inputFile);
@@ -735,7 +712,6 @@ void Parser(char *inputFile, vector<Object *> &scene_objects) {
                                                         pickAColor(stod(sep.at(3)), stod(sep.at(4))));
 
                 scene_objects.push_back(scene_cylinder);
-                //cout << "Un cylindre" ;
             }
         }
         myfile.close();
@@ -747,22 +723,34 @@ void Parser(char *inputFile, vector<Object *> &scene_objects) {
     }
 }
 
+
+/**
+ * @method:
+ * @description:
+ * @param   ray   (Ray)  -- tracer object that defines its point and direction in 3-space.
+ * @return.
+**/
 static void Exit(void) {
     /* rien à faire ici puisqu'il n'y a pas d'allocation dynamique */
     fprintf(stdout, "\nbye !\n");
 }
+
 double xamnt, yamnt;
 
 
-
-
-static void action1(void){
-    booleanEnregistrementFichier=1;
+/**
+ * @method:
+ * @description:
+ * @param   ray   (Ray)  -- tracer object that defines its point and direction in 3-space.
+ * @return.
+**/
+static void action1(void) {
+    booleanEnregistrementFichier = 1;
 }
 
 
 static void Dessin(void) {
-    cout<<"salut"<<endl;
+    cout << "salut" << endl;
 
 
 //Là ou la camera va regarder. Difference entre le point ou la camera va regarder et la camera
@@ -790,55 +778,52 @@ static void Dessin(void) {
                 xamnt = (x + 0.5) / width;
                 yamnt = ((height - y) + 0.5) / height;
             }
-            //l'origine de nos rayons sera l'origine de notre camera
-            Vect cam_ray_origin = scene_cam.getCameraPostion();
-            Vect cam_ray_direction = cameradirection.vectAdd(
-                    cameraright.vectMult(xamnt - 0.5).vectAdd(cameradown.vectMult(yamnt - 0.5))).normalize();
-            Ray cam_ray(cam_ray_origin, cam_ray_direction);
-            vector<double> intersections;
+            for (int rayIndex = 0; rayIndex < light_sources.size(); rayIndex++) {
+                //l'origine de nos rayons sera l'origine de notre camera
+                Vect cam_ray_origin = scene_cam.getCameraPostion();
+                Vect cam_ray_direction = cameradirection.vectAdd(
+                        cameraright.vectMult(xamnt - 0.5).vectAdd(cameradown.vectMult(yamnt - 0.5))).normalize();
+                Ray cam_ray(cam_ray_origin, cam_ray_direction);
+                vector<double> intersections;
 
-            //Maintenant on fait une boucle pour voir si le rayon qu'on vient de creer va avoir une
-            //intersection avec nos objects
+                //Maintenant on fait une boucle pour voir si le rayon qu'on vient de creer va avoir une
+                //intersection avec nos objects
 
-            for (int index = 0; index < scene_objects.size(); index++) {
-                intersections.push_back(scene_objects.at(index)->findIntersection(cam_ray));
-            }
-            //the object closest to the camera
-            int index_of_closest_Object = closestObject(intersections);
-            //cout << index_of_closest_Object;
-            //return color
-            if (index_of_closest_Object == -1) {
-                //set the background black
-                pixels[thisone].r = 0;
-                pixels[thisone].g = 0;
-                pixels[thisone].b = 0;
-            } else {
-                // index corresponds to an object in our scene
-                if (intersections.at(index_of_closest_Object) > accuracy) {
+                for (int index = 0; index < scene_objects.size(); index++) {
+                    intersections.push_back(scene_objects.at(index)->findIntersection(cam_ray));
+                }
 
-                    //Determine the position and direction vectors at the point of intersection
-                    Vect intersection_position = cam_ray_origin.vectAdd(
-                            cam_ray_direction.vectMult(intersections.at(index_of_closest_Object)));
-                    Vect intersecting_ray_direction = cam_ray_direction;
+                //the object closest to the camera
+                int index_of_closest_Object = closestObject(intersections);
+                //cout << index_of_closest_Object;
+                //return color
+                if (index_of_closest_Object == -1) {
+                    //set the background black
+                    pixels[thisone].r = 0;
+                    pixels[thisone].g = 0;
+                    pixels[thisone].b = 0;
+                } else {
+                    // index corresponds to an object in our scene
+                    if (intersections.at(index_of_closest_Object) > accuracy) {
 
-                    Color intersection_color = getColorAt(intersection_position, intersecting_ray_direction,
-                                                          scene_objects, index_of_closest_Object, accuracy,
-                                                          light_sources, ambientlight);
-                    pixels[thisone] = intersection_color.returnForPixelColor();
+                        //Determine the position and direction vectors at the point of intersection
+                        Vect intersection_position = cam_ray_origin.vectAdd(
+                                cam_ray_direction.vectMult(intersections.at(index_of_closest_Object)));
+                        Vect intersecting_ray_direction = cam_ray_direction;
+
+                        Color intersection_color = getColorAt(intersection_position, intersecting_ray_direction,
+                                                              scene_objects, index_of_closest_Object, accuracy,
+                                                              light_sources, ambientlight);
+
+
+                        pixels[thisone] = intersection_color.returnForPixelColor();
+                    }
                 }
             }
 
-
         }
     }
-//    for (int i = 0; i < k; i++) {
-//        RGBType rgb = data[i];
-//        double red = (data[i].r) * 255;
-//        double green = (data[i].g) * 255;
-//        double blue = (data[i].b) * 255;
-//        unsigned char color[3] = {(int) floor(blue), (int) floor(green), (int) floor(red)};
-//        fwrite(color, 1, 3, f);
-//    }
+
 
     float rgb[width][height][3];
 
@@ -852,51 +837,16 @@ static void Dessin(void) {
     }
 
 
-//
-//    char rgb[width*height*3];
-//
-//    for (int i = 0; i< width*height;i+=3){
-//        rgb[i] = (pixels[i].r) * 255;
-//        rgb[i+1] = (pixels[i].g) * 255;
-//        rgb[i+2] = (pixels[i].b) * 255;
-//    }
-//
-//
-
-if(booleanEnregistrementFichier==1){
-    savebmp("out.bmp", width, height, dpi, pixels);
-    booleanEnregistrementFichier=0;
-}
+    if (booleanEnregistrementFichier == 1) {
+        savebmp("out.bmp", width, height, dpi, pixels);
+        booleanEnregistrementFichier = 0;
+    }
 
 //    cout<<"salut"<<buffer<<endl;
     glDrawPixels(width, height, GL_RGB, GL_FLOAT, rgb);
 }
 
-//void creerImage(const char *filename, int w, int h, int dpi, RGBType *data){
-//
-//
-//
-//
-//    FILE *fp = fopen("first.ppm", "wb"); /* b - binary mode */
-//    (void) fprintf(fp, "P6\n%d %d\n1\n", w, h);
-//int thisone;
-//    float rgb[w][h][3];
-//    for (int x = 0; x < w; x++) {
-//        for (int y = 0; y < h; y++) {
-//            thisone = y * h + x;
-//            rgb[y][x][0] = (data[thisone].r);
-//            rgb[y][x][1] = (data[thisone].g);
-//            rgb[y][x][2] = (data[thisone].b);
-//            (void) fwrite(rgb[x][y], 1, 3, fp);
-//        }
-//    }
-//
-//    (void) fclose(fp);
-//
-//
-//
-//
-//}
+
 int niveau1() {
     int dpi = 72;
     int width = 640;
@@ -921,7 +871,6 @@ int niveau1() {
 
     //le point ou la camera va regarder
     Vect pointToLook(0, 0, 0);
-    //Vect diff_btw(cameraPosition.getVectX() - pointToLook.getVectX(), cameraPosition.getVectY() - pointToLook.getVectY(), cameraPosition.getVectZ() - pointToLook.getVectZ());
 
 
 
@@ -957,11 +906,6 @@ int niveau1() {
 
 
     Parser(inputFile, scene_objects);
-    //generator(scene_objects);
-    //scene_objects = constructor(scene_objects);
-    //int min=-1,max=-1;
-    //PointsLesPlusSepares(min, max, scene_objects, scene_objects.size());
-
 
     scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
 
@@ -1039,7 +983,7 @@ int niveau2(int ps) {
     for (int i = 0; i < ps; i++) {
         //source de lumière
 
-        Vect light_position(fRand(0, 100), fRand(0, 100), fRand(0, 100));
+        Vect light_position(fRand(-255, 255), fRand(-255, 255), fRand(-255, 255));
         Light scene_light(light_position, RandomColor());
 
         //Tableau pour avoir plusieurs sources de lumière
@@ -1048,19 +992,14 @@ int niveau2(int ps) {
 
 
 
-    //Creation de la sphere
+    //Creation de la sphere1
     Plane scene_plane(YVect, -1, gray);
 
 
     vector<Object *> scene_objects;
 
-    cout << "tffffff" << endl;
     Parser(inputFile, scene_objects);
     //generator(scene_objects);
-    //scene_objects = constructor(scene_objects);
-    //int min=-1,max=-1;
-    //PointsLesPlusSepares(min, max, scene_objects, scene_objects.size());
-
 
     scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
 
@@ -1124,27 +1063,40 @@ int niveau2(int ps) {
         }
     }
 
-    savebmp("scene.bmp", width, height, dpi, pixels);
+    savebmp(outputFile, width, height, dpi, pixels);
     return 0;
 }
 
+void moveUp(void) {
+    pointToLook.y = pointToLook.y + 10;
+
+}
+
+void moveDown(void) {
+    pointToLook.y = pointToLook.y - 10;
+
+}
+
+void moveLeft(void) {
+    pointToLook.z = pointToLook.z - 10;
+}
+
+void moveRight(void) {
+    pointToLook.z = pointToLook.z + 10;
+
+}
 
 
 int niveau3() {
     cout << "rendering ..." << endl;
 
     //Creation de la sphere
-    Plane scene_plane(YVect, -1, gray);
-
-
-
+    Plane scene_plane(YVect, -1, Color((double) 10));
 
 
     Parser(inputFile, scene_objects);
     //generator(scene_objects);
-    //scene_objects = constructor(scene_objects);
-    //int min=-1,max=-1;
-    //PointsLesPlusSepares(min, max, scene_objects, scene_objects.size());
+
 
 
     scene_objects.push_back(dynamic_cast<Object *> (&scene_plane));
@@ -1161,37 +1113,41 @@ int niveau3() {
     g3x_InitWindow("Lray", width, height);
 
     g3x_SetScrollWidth(6);
-    g3x_CreateScrollv_d("ray", &ambientlight, 0.1, 1.0, 1.0, "Deplacement lateral camera");
-    g3x_CreateScrollv_d("ang", &ambientlight, 0.0, 1.0, 1.0, "angle rotation   ");
-    g3x_CreateScrollv_d("alf", &ambientlight, 0.0, 1.0, 1.0, "transparence cube");
+    g3x_CreateScrollv_d("am", &ambientlight, 0.1, 1.0, 1.0, "Intensité de la lumiere ambiante");
+    g3x_CreateScrollv_d("ps", &nombreRayonParPixel, 0.0, 50.0, 1.0, "nombre de rayon par pixel");
 
     g3x_SetScrollWidth(4);
-    g3x_CreateScrollh_d("CAMX", &cameraPosition.x, -255.0, 255.0, 1.0, "Deplacement horizontal camera");
-    g3x_CreateScrollh_d("CAMY", &cameraPosition.y, -255.0, 255.0, 1.0, "intensite lumiere ambiante  ");
     g3x_CreateScrollh_d("CAMZ", &cameraPosition.z, -255.0, 255.0, 1.0, "intensite lumiere ambiante  ");
+    g3x_CreateScrollh_d("CAMY", &cameraPosition.y, -255.0, 255.0, 1.0, "intensite lumiere ambiante  ");
+    g3x_CreateScrollh_d("CAMX", &cameraPosition.x, -255.0, 600.0, 1.0, "Deplacement horizontal camera");
 
 
 
 
     /* action attachées à des touches */
-      g3x_SetKeyAction('s', action1, "Enregistrement sous out.bmp");
-//    g3x_SetKeyAction('G', action2, "variation de couleur");
-//    g3x_SetKeyAction('c', camera_info, "pos./dir. de la camera => terminal");
+    g3x_SetKeyAction('z', moveUp, "Deplacement vers le haut");
+    g3x_SetKeyAction('s', moveDown, "Deplacement vers le bas");
+    g3x_SetKeyAction('q', moveLeft, "Deplacement vers la gauche");
+    g3x_SetKeyAction('d', moveRight, "Deplacement vers la droite");
 
-    /* initialisation d'une carte de couleurs */
-    //g3x_FillColorMap(colmap, MAXCOL);
-    /* définition des fonctions */
     g3x_SetExitFunction(Exit);     /* la fonction de sortie */
     g3x_SetDrawFunction(Dessin);     /* la fonction de Dessin */
     //g3x_SetAnimFunction(Anim);
 
 
 
-   /* boucle d'exécution principale */
+    /* boucle d'exécution principale */
     return g3x_MainStart();
 
 }
 
+
+/**
+ * @method:
+ * @description:
+ * @param   ray   (Ray)  -- tracer object that defines its point and direction in 3-space.
+ * @return.
+**/
 void usage() {
     cout <<
     "Pour le niveau 1 la commande a lancer est la suivante : \n -> lray -n 1 -i <mon_fichier.format> -o image.ppm \n Pour le niveau 2 la commande est la suivante : \n -> lray -n 2 -ps 16 -i <mon_fichier.format> -o image.ppm "
@@ -1202,7 +1158,7 @@ int main(int argc, char *argv[]) {
 
     cout << "rendering ..." << endl;
 
-    int nombreRayonParPixel = 1;
+    nombreRayonParPixel = 1;
     int NIVEAU_1_FLAG = 0;
     int NIVEAU_2_FLAG = 0;
     int NIVEAU_3_FLAG = 0;

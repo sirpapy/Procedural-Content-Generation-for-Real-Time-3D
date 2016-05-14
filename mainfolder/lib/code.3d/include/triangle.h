@@ -12,6 +12,9 @@
 
 using namespace std;
 
+
+
+//Definition de la classe du triangle
 class Triangle : public Object {
     Vect A, B, C;
     Vect CA;
@@ -19,6 +22,7 @@ class Triangle : public Object {
     double distance;
     Color color;
 
+    //Structure englobant du triangle
     struct BoundingBox {
         Vect bbMin;
         Vect bbMax;
@@ -29,13 +33,14 @@ public:
 
     Triangle(Vect, Vect, Vect, Color);
 
-    //method functions
 
 
+    //récupére la couleur du triangle
     Color getColor() {
         return color;
 
     }
+
 
     virtual Vect getNormal(/*BA*/) {
         return CA.crossProduct(BA).normalize();
@@ -45,17 +50,27 @@ public:
         return getNormal();
     }
 
-
+    /**
+     * @method: findIntersection
+     * @description: Calcul les intersection entre un rayon et l'objet courant
+     * @param   ray   (Ray)  -- Un vecteur définie par 3axe (qui correspond à notre rayon).
+     * @return le point d'intersection s'il ya ou -1 si le rayon à loupé l'objet.
+    **/
     virtual double findIntersection(Ray ray) {
         Vect ray_direction = ray.getRayDirection();
         Vect ray_origin = ray.getRayOrigin();
 
+
+
+//        Produit scalaire avec la normal du triangle, si cela renvoie 0 alors le rayon est parallele au triangle.
+//        donc il peut pas y avoir une intersection
         double a = ray_direction.dotProduct(getNormal());
 
         if (a == 0) {
-            //parallel
+            //Parallele, pas d'intersection
             return -1;
         } else {
+
             double b = getNormal().dotProduct(ray.getRayOrigin().vectAdd(getNormal().vectMult(distance).negative()));
             double distance2plane = -1 * b / a;
             double Qx = ray_direction.vectMult(distance2plane).getVectX() + ray_origin.getVectX();
@@ -102,7 +117,12 @@ public:
     }
 
 
-
+    /**
+     * @method:
+     * @description:
+     * @param   ray   (Ray)  -- tracer object that defines its point and direction in 3-space.
+     * @return.
+    **/
     BoundingBox compute_bounding_box(Vect v1, Vect v2, Vect v3) {
         BoundingBox bbox;
         bbox.bbMin.x = min(min(v1.x, v2.x), v3.x);
@@ -161,31 +181,6 @@ return bbox;
 
 
 
-//  virtual Sphere getSBBOX() {
-//        Vect milieuAB = getMiddle(A, B);
-//        Vect milieuBC = getMiddle(B, C);
-//
-//        float penteAB = -1 / penteVecteur(A, B);
-//        float penteBC = -1 / penteVecteur(B, C);
-//
-//        float bAB = milieuAB.y - penteAB * milieuAB.x;
-//        float bBC = milieuBC.y - penteBC * milieuBC.x;
-//
-//
-//        float x = (bAB - bBC) / (penteBC - penteAB);
-//        Vect center = Vect(x, (penteAB * x) + bAB, 0);
-//        double rayon = A.distance(center);
-//        Color color = Color(0.91, 0.54, 0.0, 0.0);
-//
-//
-//        cout << "A " << A.getVectX() << " " << A.getVectY() << " " << A.getVectZ() << endl;
-//        cout << "B " << B.getVectX() << " " << B.getVectY() << " " << B.getVectZ() << endl;
-//        cout << "C " << C.getVectX() << " " << C.getVectY() << " " << C.getVectZ() << endl;
-//
-//
-//        return Sphere(center, rayon, color);
-//        //penteVecteur(B, C);
-//    }
     double getVolume() {
         float dotABAB = B.vectAdd(A.negative()).dotProduct(B.vectAdd(A.negative()));
         float dotABAC = B.vectAdd(A.negative()).dotProduct(C.vectAdd(A.negative()));

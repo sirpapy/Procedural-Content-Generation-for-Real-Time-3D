@@ -13,6 +13,7 @@ class Color {
 
 public:
     Color();
+    Color(double);
 
     Color(double, double, double, double);
     //method functions
@@ -20,6 +21,8 @@ public:
     double getColorRed() {
         return red;
     }
+
+
 
     double getColorGreen() {
         return green;
@@ -82,13 +85,23 @@ public:
     Color colorAverage(Color color){
         return Color((red+color.getColorRed())/2, (green+color.getColorGreen())/2, (red+color.getColorRed())/2, (special+color.getColorSpecial())/2);
     }
+
+
+
+
+    /**
+ * @method: clip
+ * @description: Permet de normaliser les couleurs. Cest à dire Si la valeur d'une couleur dépasse 1
+               * on le remet à 1 et si inferieur à 0, on le remet à 0
+ * @return retourne la couleur normalisé
+**/
     Color clip(){
-        double alllight = red+blue+green;
-        double excesslight = alllight - 3;
-        if(excesslight>0){
-                red = red + excesslight*(red/alllight);
-                green = green + excesslight*(green/alllight);
-                blue = blue + excesslight*(blue/alllight);
+        double sommeCouleurs = red+blue+green;
+        double testeurDeLimite = sommeCouleurs - 3;
+        if(testeurDeLimite>0){
+                red = red + testeurDeLimite*(red/sommeCouleurs);
+                green = green + testeurDeLimite*(green/sommeCouleurs);
+                blue = blue + testeurDeLimite*(blue/sommeCouleurs);
         }
         if(red > 1){
             red = 1;
@@ -119,6 +132,13 @@ public:
 
 
 };
+
+Color::Color(double s) {
+    red = 0.5;
+    green = 0.5;
+    blue = 0.5;
+    special = s;
+}
 
 Color::Color() {
     red = 0.5;
